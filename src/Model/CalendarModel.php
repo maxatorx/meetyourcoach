@@ -37,6 +37,19 @@ final class CalendarModel
         return array_values($indexed);
     }
 
+    private function isWorkshop(array $row): bool
+    {
+        return ($row['content_type'] ?? '') === 'atelier';
+    }
+
+    private function eventDateForRow(array $row): DateTimeImmutable
+    {
+        if ($this->isWorkshop($row) && !empty($row['scheduled_at'])) {
+            return new DateTimeImmutable($row['scheduled_at']);
+        }
+        return new DateTimeImmutable($row['inscription_date']);
+    }
+
     /**
      * @return array<int, array<string, mixed>>
      */
@@ -70,22 +83,18 @@ final class CalendarModel
 
         $events = [];
         while ($row = $statement->fetch()) {
-            $eventDate = null;
-            if ($row['content_type'] === 'atelier' && !empty($row['scheduled_at'])) {
-                $eventDate = new DateTimeImmutable($row['scheduled_at']);
-            } else {
-                $eventDate = new DateTimeImmutable($row['inscription_date']);
-            }
+            $eventDate = $this->eventDateForRow($row);
 
             if ($eventDate < $start || $eventDate > $end) {
                 continue;
             }
 
-            $title = $row['content_type'] === 'atelier' ? $row['workshop_title'] : $row['course_title'];
+            $title = $this->isWorkshop($row) ? $row['workshop_title'] : $row['course_title'];
             if (empty($title)) {
                 continue;
             }
 
+            $isWorkshop = $this->isWorkshop($row);
             $events[] = [
                 'id' => 'registration-' . $row['id'],
                 'content_key' => $this->buildContentKey($row['content_type'], (int) $row['content_id']),
@@ -93,16 +102,16 @@ final class CalendarModel
                 'title' => $title,
                 'type' => $row['content_type'],
                 'context' => 'inscription',
-                'location' => $row['content_type'] === 'atelier' ? ($row['lieu'] ?? null) : null,
-                'description' => $row['content_type'] === 'atelier' ? ($row['workshop_description'] ?? '') : ($row['course_description'] ?? ''),
-                'price' => $row['content_type'] === 'atelier' ? $row['workshop_price'] : $row['course_price'],
-                'capacity' => ($row['content_type'] === 'atelier' && $row['nb_places'] !== null)
+                'location' => $isWorkshop ? ($row['lieu'] ?? null) : null,
+                'description' => $isWorkshop ? ($row['workshop_description'] ?? '') : ($row['course_description'] ?? ''),
+                'price' => $isWorkshop ? $row['workshop_price'] : $row['course_price'],
+                'capacity' => ($isWorkshop && $row['nb_places'] !== null)
                     ? ($row['nb_inscrits'] . '/' . $row['nb_places'])
                     : null,
                 'cta' => $this->buildContentUrl($row['content_type'], (int) $row['content_id']),
                 'cta_label' => 'Voir le détail',
-                'status' => $row['content_type'] === 'atelier' ? 'Participation confirmée' : 'Cours en autonomie',
-                'subtitle' => $row['content_type'] === 'atelier' ? 'Atelier réservé' : 'Cours suivi',
+                'status' => $isWorkshop ? 'Participation confirmée' : 'Cours en autonomie',
+                'subtitle' => $isWorkshop ? 'Atelier réservé' : 'Cours suivi',
             ];
         }
 
@@ -155,50 +164,6 @@ final class CalendarModel
         return $events;
     }
 
-    /**
-     * @return array<int, array<string, mixed>>
-     */
-    private function getPublicEvents(DateTimeImmutable $start, DateTimeImmutable $end): array
-    {
-        $statement = $this->pdo->prepare(
-            'SELECT id, titre, scheduled_at, lieu, nb_places, nb_inscrits, statut, description, prix
-             FROM atelier
-             WHERE statut IN (:valide, :en_attente)
-               AND scheduled_at BETWEEN :start AND :end
-             ORDER BY scheduled_at ASC'
-        );
-        $statement->execute([
-            'valide' => Workshop::STATUT_VALIDE,
-            'en_attente' => Workshop::STATUT_EN_ATTENTE,
-            'start' => $start->format('Y-m-d H:i:s'),
-            'end' => $end->format('Y-m-d H:i:s'),
-        ]);
-
-        $events = [];
-        while ($row = $statement->fetch()) {
-            if (empty($row['scheduled_at'])) {
-                continue;
-            }
-            $events[] = [
-                'id' => 'public-' . $row['id'],
-                'content_key' => $this->buildContentKey('atelier', (int) $row['id']),
-                'date' => new DateTimeImmutable($row['scheduled_at']),
-                'title' => $row['titre'],
-                'type' => 'atelier',
-                'context' => 'public',
-                'location' => $row['lieu'],
-                'description' => $row['description'] ?? '',
-                'price' => $row['prix'],
-                'capacity' => $row['nb_inscrits'] . '/' . $row['nb_places'],
-                'cta' => 'atelier/' . $row['id'],
-                'cta_label' => 'Découvrir l\'atelier',
-                'status' => ucfirst($row['statut']),
-                'subtitle' => 'Ouvert aux inscriptions',
-            ];
-        }
-
-        return $events;
-    }
 
     private function buildContentUrl(string $type, int $contentId): ?string
     {

@@ -40,6 +40,7 @@ final class LearnerController extends AbstractController
 
         if ($httpMethod === 'POST') {
             $this->updateProfile();
+            return;
         }
 
         // Espace apprenant : inscriptions + avis.

@@ -32,6 +32,7 @@ final class ProfileController extends AbstractController
 
         if ($httpMethod === 'POST') {
             $this->updateProfile();
+            return;
         }
 
         $this->render('profile/index.html.twig', [

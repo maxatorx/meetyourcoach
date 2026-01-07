@@ -143,9 +143,7 @@ final class CalendarController extends AbstractController
                 $this->redirect('/login');
                 return;
             }
-            $isOwner = (int) $user['id'] === $ownerId;
-            $isAdmin = ($user['role'] ?? null) === 'admin';
-            if (!$isOwner && !$isAdmin) {
+            if (!$this->isOwnerOrAdmin($user, $ownerId)) {
                 $this->flashBag->add('danger', 'Cet événement est privé.');
                 $this->redirect('/calendrier');
                 return;
@@ -176,9 +174,8 @@ final class CalendarController extends AbstractController
 
         $user = $this->userSession->getUser();
         $ownerId = $event->getUserId();
-        $isAdmin = ($user['role'] ?? null) === 'admin';
         // Suppression autorisee pour le proprietaire ou l'admin.
-        if ($ownerId !== null && (int) $user['id'] !== $ownerId && !$isAdmin) {
+        if ($ownerId !== null && !$this->isOwnerOrAdmin($user, $ownerId)) {
             $this->flashBag->add('danger', 'Vous ne pouvez pas supprimer cet événement.');
             $this->redirect('/calendrier');
             return;
@@ -300,5 +297,16 @@ final class CalendarController extends AbstractController
             'formateur' => 'calendar.intro.formateur',
             default => 'calendar.intro.default',
         };
+    }
+
+    private function isOwnerOrAdmin(?array $user, int $ownerId): bool
+    {
+        if ($user === null) {
+            return false;
+        }
+        if ((int) ($user['id'] ?? 0) === $ownerId) {
+            return true;
+        }
+        return ($user['role'] ?? null) === 'admin';
     }
 }

@@ -96,65 +96,103 @@ final class TrainerController extends AbstractController
         $formType = $_POST['form_type'] ?? '';
         if ($formType === 'course') {
             $courseId = (int) ($_POST['course_id'] ?? 0);
-            if ($courseId > 0) {
-                $this->updateCourse($courseId);
-            } else {
-                $this->createCourse();
-            }
+            $this->saveCourse($courseId);
         } elseif ($formType === 'workshop') {
             $workshopId = (int) ($_POST['workshop_id'] ?? 0);
-            if ($workshopId > 0) {
-                $this->updateWorkshop($workshopId);
-            } else {
-                $this->createWorkshop();
-            }
+            $this->saveWorkshop($workshopId);
         }
     }
 
-    private function createCourse(): void
+    private function saveCourse(int $courseId): void
     {
         $trainerId = (int) $this->userSession->getUser()['id'];
+        $course = $courseId > 0 ? $this->courseModel->findById($courseId) : null;
+        if ($courseId > 0 && ($course === null || $course->getTrainerId() !== $trainerId)) {
+            $this->flashBag->add('danger', 'Modification non autorisée.');
+            return;
+        }
+
         try {
-            $course = new Course(
-                trim($_POST['titre'] ?? ''),
-                trim($_POST['description'] ?? ''),
-                (float) ($_POST['prix'] ?? 0),
-                $trainerId,
-                $_POST['niveau'] ?? Course::NIVEAU_DEBUTANT,
-                // Soumis à validation admin avant publication.
-                Course::STATUT_BROUILLON
-            );
+            if ($course === null) {
+                $course = new Course(
+                    trim($_POST['titre'] ?? ''),
+                    trim($_POST['description'] ?? ''),
+                    (float) ($_POST['prix'] ?? 0),
+                    $trainerId,
+                    $_POST['niveau'] ?? Course::NIVEAU_DEBUTANT,
+                    // Soumis à validation admin avant publication.
+                    Course::STATUT_BROUILLON
+                );
+            } else {
+                $course->setTitle(trim($_POST['titre'] ?? $course->getTitle()));
+                $course->setDescription(trim($_POST['description'] ?? $course->getDescription()));
+                $course->setPrice((float) ($_POST['prix'] ?? $course->getPrice()));
+                $course->setLevel($_POST['niveau'] ?? $course->getLevel());
+                // Toute modification repasse en validation admin.
+                $course->setStatus(Course::STATUT_BROUILLON);
+            }
             if ($imagePath = $this->uploadImage('image')) {
                 $course->setImageUrl($imagePath);
             }
-            $this->courseModel->create($course);
-            $this->flashBag->add('success', 'Cours soumis pour validation.');
+            if ($courseId > 0) {
+                $this->courseModel->update($course);
+                $this->flashBag->add('success', 'Cours mis à jour et soumis pour validation.');
+            } else {
+                $this->courseModel->create($course);
+                $this->flashBag->add('success', 'Cours soumis pour validation.');
+            }
         } catch (\Throwable $exception) {
             $this->flashBag->add('danger', $exception->getMessage());
         }
     }
 
-    private function createWorkshop(): void
+    private function saveWorkshop(int $workshopId): void
     {
         $trainerId = (int) $this->userSession->getUser()['id'];
+        $workshop = $workshopId > 0 ? $this->workshopModel->findById($workshopId) : null;
+        if ($workshopId > 0 && ($workshop === null || $workshop->getTrainerId() !== $trainerId)) {
+            $this->flashBag->add('danger', 'Modification non autorisée.');
+            return;
+        }
+
         try {
-            $workshop = new Workshop(
-                trim($_POST['titre'] ?? ''),
-                trim($_POST['description'] ?? ''),
-                (float) ($_POST['prix'] ?? 0),
-                $trainerId,
-                new \DateTimeImmutable($_POST['date'] ?? 'now'),
-                (int) ($_POST['duree'] ?? 60),
-                (int) ($_POST['places'] ?? 10),
-                trim($_POST['lieu'] ?? ''),
-                // Soumis à validation admin avant mise en ligne.
-                Workshop::STATUT_EN_ATTENTE
-            );
+            if ($workshop === null) {
+                $workshop = new Workshop(
+                    trim($_POST['titre'] ?? ''),
+                    trim($_POST['description'] ?? ''),
+                    (float) ($_POST['prix'] ?? 0),
+                    $trainerId,
+                    new \DateTimeImmutable($_POST['date'] ?? 'now'),
+                    (int) ($_POST['duree'] ?? 60),
+                    (int) ($_POST['places'] ?? 10),
+                    trim($_POST['lieu'] ?? ''),
+                    // Soumis à validation admin avant mise en ligne.
+                    Workshop::STATUT_EN_ATTENTE
+                );
+            } else {
+                $workshop->setTitle(trim($_POST['titre'] ?? $workshop->getTitle()));
+                $workshop->setDescription(trim($_POST['description'] ?? $workshop->getDescription()));
+                $workshop->setPrice((float) ($_POST['prix'] ?? $workshop->getPrice()));
+                $dateInput = $_POST['date'] ?? null;
+                if ($dateInput) {
+                    $workshop->setScheduledAt(new \DateTimeImmutable($dateInput));
+                }
+                $workshop->setDurationMinutes((int) ($_POST['duree'] ?? $workshop->getDurationMinutes()));
+                $workshop->setNbPlaces((int) ($_POST['places'] ?? $workshop->getNbPlaces()));
+                $workshop->setLocation(trim($_POST['lieu'] ?? $workshop->getLocation()));
+                // Toute modification repasse en validation admin.
+                $workshop->setStatus(Workshop::STATUT_EN_ATTENTE);
+            }
             if ($imagePath = $this->uploadImage('image')) {
                 $workshop->setImageUrl($imagePath);
             }
-            $this->workshopModel->create($workshop);
-            $this->flashBag->add('success', 'Atelier soumis pour validation.');
+            if ($workshopId > 0) {
+                $this->workshopModel->update($workshop);
+                $this->flashBag->add('success', 'Atelier mis à jour et soumis pour validation.');
+            } else {
+                $this->workshopModel->create($workshop);
+                $this->flashBag->add('success', 'Atelier soumis pour validation.');
+            }
         } catch (\Throwable $exception) {
             $this->flashBag->add('danger', $exception->getMessage());
         }
@@ -263,61 +301,4 @@ final class TrainerController extends AbstractController
         return $workshop;
     }
 
-    private function updateCourse(int $courseId): void
-    {
-        $course = $this->courseModel->findById($courseId);
-        $trainerId = (int) $this->userSession->getUser()['id'];
-        if ($course === null || $course->getTrainerId() !== $trainerId) {
-            $this->flashBag->add('danger', 'Modification non autorisée.');
-            return;
-        }
-
-        try {
-            $course->setTitle(trim($_POST['titre'] ?? $course->getTitle()));
-            $course->setDescription(trim($_POST['description'] ?? $course->getDescription()));
-            $course->setPrice((float) ($_POST['prix'] ?? $course->getPrice()));
-            $course->setLevel($_POST['niveau'] ?? $course->getLevel());
-            // Toute modification repasse en validation admin.
-            $course->setStatus(Course::STATUT_BROUILLON);
-            if ($imagePath = $this->uploadImage('image')) {
-                $course->setImageUrl($imagePath);
-            }
-            $this->courseModel->update($course);
-            $this->flashBag->add('success', 'Cours mis à jour et soumis pour validation.');
-        } catch (\Throwable $exception) {
-            $this->flashBag->add('danger', $exception->getMessage());
-        }
-    }
-
-    private function updateWorkshop(int $workshopId): void
-    {
-        $workshop = $this->workshopModel->findById($workshopId);
-        $trainerId = (int) $this->userSession->getUser()['id'];
-        if ($workshop === null || $workshop->getTrainerId() !== $trainerId) {
-            $this->flashBag->add('danger', 'Modification non autorisée.');
-            return;
-        }
-
-        try {
-            $workshop->setTitle(trim($_POST['titre'] ?? $workshop->getTitle()));
-            $workshop->setDescription(trim($_POST['description'] ?? $workshop->getDescription()));
-            $workshop->setPrice((float) ($_POST['prix'] ?? $workshop->getPrice()));
-            $dateInput = $_POST['date'] ?? null;
-            if ($dateInput) {
-                $workshop->setScheduledAt(new \DateTimeImmutable($dateInput));
-            }
-            $workshop->setDurationMinutes((int) ($_POST['duree'] ?? $workshop->getDurationMinutes()));
-            $workshop->setNbPlaces((int) ($_POST['places'] ?? $workshop->getNbPlaces()));
-            $workshop->setLocation(trim($_POST['lieu'] ?? $workshop->getLocation()));
-            // Toute modification repasse en validation admin.
-            $workshop->setStatus(Workshop::STATUT_EN_ATTENTE);
-            if ($imagePath = $this->uploadImage('image')) {
-                $workshop->setImageUrl($imagePath);
-            }
-            $this->workshopModel->update($workshop);
-            $this->flashBag->add('success', 'Atelier mis à jour et soumis pour validation.');
-        } catch (\Throwable $exception) {
-            $this->flashBag->add('danger', $exception->getMessage());
-        }
-    }
 }

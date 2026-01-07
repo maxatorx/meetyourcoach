@@ -26,9 +26,8 @@ final class ContactController extends AbstractController
     {
         // Affiche le formulaire ou traite l'envoi.
         if ($httpMethod === 'POST') {
-            if ($this->handleSubmission()) {
-                return;
-            }
+            $this->handleSubmission();
+            return;
         }
 
         $this->render('contact/index.html.twig', [
@@ -36,13 +35,13 @@ final class ContactController extends AbstractController
         ]);
     }
 
-    private function handleSubmission(): bool
+    private function handleSubmission(): void
     {
         $token = $_POST['csrf_token'] ?? '';
         if (!$this->csrfTokenManager->validateToken($token, 'contact_form')) {
             $this->flashBag->add('danger', 'Session expirée. Merci de réessayer.');
             $this->redirect('/contact');
-            return true;
+            return;
         }
 
         $fullName = trim($_POST['full_name'] ?? '');
@@ -53,13 +52,13 @@ final class ContactController extends AbstractController
         if ($fullName === '' || $email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $this->flashBag->add('danger', 'Merci de renseigner un nom et un e-mail valides.');
             $this->redirect('/contact');
-            return true;
+            return;
         }
 
         if ($goal === '') {
             $this->flashBag->add('danger', 'Merci de préciser votre besoin.');
             $this->redirect('/contact');
-            return true;
+            return;
         }
 
         $payload = [
@@ -74,7 +73,6 @@ final class ContactController extends AbstractController
         $this->flashBag->add('success', 'Votre demande a bien été envoyée. Nous revenons vers vous sous 24h.');
 
         $this->redirect('/contact');
-        return true;
     }
 
     /**

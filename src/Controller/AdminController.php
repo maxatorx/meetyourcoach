@@ -68,17 +68,9 @@ final class AdminController extends AbstractController
 
         $action = $_POST['action'] ?? '';
         if ($action === 'validate_course') {
-            // Validation admin des cours.
-            $id = (int) ($_POST['course_id'] ?? 0);
-            $status = $_POST['status'] ?? Course::STATUT_PUBLIE;
-            $this->courseModel->updateStatus($id, $status);
-            $this->flashBag->add('success', 'Statut du cours mis à jour.');
+            $this->updateCourseStatus();
         } elseif ($action === 'validate_workshop') {
-            // Validation admin des ateliers.
-            $id = (int) ($_POST['workshop_id'] ?? 0);
-            $status = $_POST['status'] ?? Workshop::STATUT_VALIDE;
-            $this->workshopModel->updateStatus($id, $status);
-            $this->flashBag->add('success', 'Statut de l\'atelier mis à jour.');
+            $this->updateWorkshopStatus();
         } elseif ($action === 'update_course') {
             $this->updateCourse((int) ($_POST['course_id'] ?? 0));
         } elseif ($action === 'update_workshop') {
@@ -93,6 +85,24 @@ final class AdminController extends AbstractController
             $this->userModel->updateRole($id, $role);
             $this->flashBag->add('success', 'Rôle utilisateur mis à jour.');
         }
+    }
+
+    private function updateCourseStatus(): void
+    {
+        // Validation admin des cours.
+        $id = (int) ($_POST['course_id'] ?? 0);
+        $status = $_POST['status'] ?? Course::STATUT_PUBLIE;
+        $this->courseModel->updateStatus($id, $status);
+        $this->flashBag->add('success', 'Statut du cours mis à jour.');
+    }
+
+    private function updateWorkshopStatus(): void
+    {
+        // Validation admin des ateliers.
+        $id = (int) ($_POST['workshop_id'] ?? 0);
+        $status = $_POST['status'] ?? Workshop::STATUT_VALIDE;
+        $this->workshopModel->updateStatus($id, $status);
+        $this->flashBag->add('success', 'Statut de l\'atelier mis à jour.');
     }
 
     private function updateCourse(int $courseId): void
