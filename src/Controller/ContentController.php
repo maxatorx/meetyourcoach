@@ -126,13 +126,6 @@ final class ContentController extends AbstractController
             $this->redirect("/$type/$id");
             return;
         }
-        $isPublished = $type === 'cours'
-            ? ($content->getStatus() === \App\Entity\Course::STATUT_PUBLIE)
-            : ($content->getStatus() === \App\Entity\Workshop::STATUT_VALIDE);
-        if (!$isPublished) {
-            $this->flashBag->add('danger', 'Ce contenu n\'est pas disponible.');
-            return $this->redirect("/$type/$id");
-        }
 
         $user = $this->userSession->getUser();
         $userId = (int) $user['id'];
