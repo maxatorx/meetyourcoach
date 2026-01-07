@@ -5,33 +5,44 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use DateTimeImmutable;
+use Twig\Environment;
 
 /**
  * Formulaire de contact simple.
  */
 final class ContactController extends AbstractController
 {
-    public function index(string $httpMethod): array
+    public function __construct(
+        Environment $twig,
+        \App\Security\UserSession $userSession,
+        \App\Security\CsrfTokenManager $csrfTokenManager,
+        \App\Service\FlashBag $flashBag,
+        string $basePath = ''
+    ) {
+        parent::__construct($twig, $userSession, $csrfTokenManager, $flashBag, $basePath);
+    }
+
+    public function index(string $httpMethod): void
     {
         // Affiche le formulaire ou traite l'envoi.
         if ($httpMethod === 'POST') {
-            $response = $this->handleSubmission();
-            if ($response !== null) {
-                return $response;
+            if ($this->handleSubmission()) {
+                return;
             }
         }
 
-        return $this->render('contact/index.html.twig', [
+        $this->render('contact/index.html.twig', [
             'csrf_token' => $this->csrfTokenManager->getToken('contact_form'),
         ]);
     }
 
-    private function handleSubmission(): ?array
+    private function handleSubmission(): bool
     {
         $token = $_POST['csrf_token'] ?? '';
         if (!$this->csrfTokenManager->validateToken($token, 'contact_form')) {
             $this->flashBag->add('danger', 'Session expirée. Merci de réessayer.');
-            return $this->redirect('/contact');
+            $this->redirect('/contact');
+            return true;
         }
 
         $fullName = trim($_POST['full_name'] ?? '');
@@ -41,12 +52,14 @@ final class ContactController extends AbstractController
 
         if ($fullName === '' || $email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $this->flashBag->add('danger', 'Merci de renseigner un nom et un e-mail valides.');
-            return $this->redirect('/contact');
+            $this->redirect('/contact');
+            return true;
         }
 
         if ($goal === '') {
             $this->flashBag->add('danger', 'Merci de préciser votre besoin.');
-            return $this->redirect('/contact');
+            $this->redirect('/contact');
+            return true;
         }
 
         $payload = [
@@ -60,7 +73,8 @@ final class ContactController extends AbstractController
         $this->storeRequest($payload);
         $this->flashBag->add('success', 'Votre demande a bien été envoyée. Nous revenons vers vous sous 24h.');
 
-        return $this->redirect('/contact');
+        $this->redirect('/contact');
+        return true;
     }
 
     /**

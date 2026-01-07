@@ -10,6 +10,7 @@ use App\Model\CalendarModel;
 use App\Service\Translator;
 use DateInterval;
 use DateTimeImmutable;
+use Twig\Environment;
 
 /**
  * Calendrier des evenements (publics + personnels).
@@ -19,15 +20,17 @@ final class CalendarController extends AbstractController
     public function __construct(
         private CalendarModel $calendarModel,
         private CalendarEventModel $calendarEventModel,
+        Environment $twig,
         \App\Security\UserSession $userSession,
         \App\Security\CsrfTokenManager $csrfTokenManager,
         \App\Service\FlashBag $flashBag,
-        private Translator $translator
+        private Translator $translator,
+        string $basePath = ''
     ) {
-        parent::__construct($userSession, $csrfTokenManager, $flashBag);
+        parent::__construct($twig, $userSession, $csrfTokenManager, $flashBag, $basePath);
     }
 
-    public function index(): array
+    public function index(): void
     {
         // Vue calendrier mensuelle avec evenements publics + personnels.
         $month = (int) ($_GET['month'] ?? date('n'));
@@ -60,7 +63,7 @@ final class CalendarController extends AbstractController
         $prev = $current->sub(new DateInterval('P1M'));
         $next = $current->add(new DateInterval('P1M'));
 
-        return $this->render('calendar/index.html.twig', [
+        $this->render('calendar/index.html.twig', [
             'calendar_weeks' => $weeks,
             'current_month_label' => $this->formatMonthLabel($current),
             'current_month' => (int) $current->format('n'),
@@ -77,14 +80,15 @@ final class CalendarController extends AbstractController
         ]);
     }
 
-    public function createEvent(): array
+    public function createEvent(): void
     {
         $this->requireLogin();
         // Creation d'un evenement personnel dans le calendrier.
         $token = $_POST['csrf_token'] ?? '';
         if (!$this->csrfTokenManager->validateToken($token, 'calendar_add_event')) {
             $this->flashBag->add('danger', 'Jeton CSRF invalide.');
-            return $this->redirect('/calendrier');
+            $this->redirect('/calendrier');
+            return;
         }
 
         $title = trim($_POST['titre'] ?? '');
@@ -95,7 +99,8 @@ final class CalendarController extends AbstractController
 
         if ($scheduledAt === false) {
             $this->flashBag->add('danger', 'Date invalide.');
-            return $this->redirect('/calendrier');
+            $this->redirect('/calendrier');
+            return;
         }
 
         try {
@@ -112,21 +117,22 @@ final class CalendarController extends AbstractController
             $this->flashBag->add('danger', $exception->getMessage());
         }
 
-        return $this->redirect(sprintf(
+        $this->redirect(sprintf(
             '/calendrier?month=%d&year=%d',
             (int) $scheduledAt->format('n'),
             (int) $scheduledAt->format('Y')
         ));
     }
 
-    public function showEvent(int $id): array
+    public function showEvent(int $id): void
     {
         // Detail d'un evenement du calendrier.
         $event = $this->calendarEventModel->findById($id);
         if ($event === null) {
-            return $this->render('calendar/show_event.html.twig', [
+            $this->render('calendar/show_event.html.twig', [
                 'event' => null,
             ], 404);
+            return;
         }
 
         $user = $this->userSession->getUser();
@@ -134,34 +140,38 @@ final class CalendarController extends AbstractController
         if ($ownerId !== null) {
             // Evenements personnels visibles par leur proprietaire ou l'admin.
             if ($user === null) {
-                return $this->redirect('/login');
+                $this->redirect('/login');
+                return;
             }
             $isOwner = (int) $user['id'] === $ownerId;
             $isAdmin = ($user['role'] ?? null) === 'admin';
             if (!$isOwner && !$isAdmin) {
                 $this->flashBag->add('danger', 'Cet événement est privé.');
-                return $this->redirect('/calendrier');
+                $this->redirect('/calendrier');
+                return;
             }
         }
 
-        return $this->render('calendar/show_event.html.twig', [
+        $this->render('calendar/show_event.html.twig', [
             'event' => $event,
         ]);
     }
 
-    public function deleteEvent(int $id): array
+    public function deleteEvent(int $id): void
     {
         $this->requireLogin();
         $token = $_POST['csrf_token'] ?? '';
         if (!$this->csrfTokenManager->validateToken($token, 'calendar_delete_' . $id)) {
             $this->flashBag->add('danger', 'Jeton CSRF invalide.');
-            return $this->redirect('/calendrier');
+            $this->redirect('/calendrier');
+            return;
         }
 
         $event = $this->calendarEventModel->findById($id);
         if ($event === null) {
             $this->flashBag->add('danger', 'Événement introuvable.');
-            return $this->redirect('/calendrier');
+            $this->redirect('/calendrier');
+            return;
         }
 
         $user = $this->userSession->getUser();
@@ -170,7 +180,8 @@ final class CalendarController extends AbstractController
         // Suppression autorisee pour le proprietaire ou l'admin.
         if ($ownerId !== null && (int) $user['id'] !== $ownerId && !$isAdmin) {
             $this->flashBag->add('danger', 'Vous ne pouvez pas supprimer cet événement.');
-            return $this->redirect('/calendrier');
+            $this->redirect('/calendrier');
+            return;
         }
 
         $month = (int) $event->getScheduledAt()->format('n');
@@ -179,7 +190,7 @@ final class CalendarController extends AbstractController
         $this->calendarEventModel->delete($id);
         $this->flashBag->add('info', 'Événement supprimé.');
 
-        return $this->redirect(sprintf('/calendrier?month=%d&year=%d', $month, $year));
+        $this->redirect(sprintf('/calendrier?month=%d&year=%d', $month, $year));
     }
 
     /**

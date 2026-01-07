@@ -8,6 +8,7 @@ use App\Model\UserModel;
 use App\Security\CsrfTokenManager;
 use App\Security\UserSession;
 use App\Service\FlashBag;
+use Twig\Environment;
 
 /**
  * Profil utilisateur (edition simple).
@@ -16,14 +17,16 @@ final class ProfileController extends AbstractController
 {
     public function __construct(
         private UserModel $userModel,
+        Environment $twig,
         UserSession $userSession,
         CsrfTokenManager $csrfTokenManager,
-        FlashBag $flashBag
+        FlashBag $flashBag,
+        string $basePath = ''
     ) {
-        parent::__construct($userSession, $csrfTokenManager, $flashBag);
+        parent::__construct($twig, $userSession, $csrfTokenManager, $flashBag, $basePath);
     }
 
-    public function index(string $httpMethod): array
+    public function index(string $httpMethod): void
     {
         $this->requireLogin();
 
@@ -31,7 +34,7 @@ final class ProfileController extends AbstractController
             $this->updateProfile();
         }
 
-        return $this->render('profile/index.html.twig', [
+        $this->render('profile/index.html.twig', [
             'csrf_token' => $this->csrfTokenManager->getToken('profile'),
         ]);
     }

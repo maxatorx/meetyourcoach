@@ -69,111 +69,107 @@ $inscriptionModel = new InscriptionModel();
 $reviewModel = new ReviewModel();
 
 // Controllers.
-$authController = new AuthController($userModel, $userSession, $csrfTokenManager, $flashBag);
-$homeController = new HomeController($contentModel, $userSession, $csrfTokenManager, $flashBag);
-$calendarController = new CalendarController($calendarModel, $calendarEventModel, $userSession, $csrfTokenManager, $flashBag, $translator);
-$languageController = new LanguageController($translator, $userSession, $csrfTokenManager, $flashBag);
-$contentController = new ContentController($courseModel, $workshopModel, $inscriptionModel, $reviewModel, $userModel, $userSession, $csrfTokenManager, $flashBag);
-$searchController = new SearchController($contentModel, $userSession, $csrfTokenManager, $flashBag);
-$learnerController = new LearnerController($userModel, $inscriptionModel, $reviewModel, $courseModel, $workshopModel, $userSession, $csrfTokenManager, $flashBag);
-$trainerController = new TrainerController($userModel, $courseModel, $workshopModel, $userSession, $csrfTokenManager, $flashBag);
-$adminController = new AdminController($userModel, $courseModel, $workshopModel, $userSession, $csrfTokenManager, $flashBag);
-$profileController = new ProfileController($userModel, $userSession, $csrfTokenManager, $flashBag);
-$contactController = new ContactController($userSession, $csrfTokenManager, $flashBag);
+$authController = new AuthController($userModel, $twig, $userSession, $csrfTokenManager, $flashBag, $basePath);
+$homeController = new HomeController($contentModel, $twig, $userSession, $csrfTokenManager, $flashBag, $basePath);
+$calendarController = new CalendarController($calendarModel, $calendarEventModel, $twig, $userSession, $csrfTokenManager, $flashBag, $translator, $basePath);
+$languageController = new LanguageController($translator, $twig, $userSession, $csrfTokenManager, $flashBag, $basePath);
+$contentController = new ContentController($courseModel, $workshopModel, $inscriptionModel, $reviewModel, $userModel, $twig, $userSession, $csrfTokenManager, $flashBag, $basePath);
+$searchController = new SearchController($contentModel, $twig, $userSession, $csrfTokenManager, $flashBag, $basePath);
+$learnerController = new LearnerController($userModel, $inscriptionModel, $reviewModel, $courseModel, $workshopModel, $twig, $userSession, $csrfTokenManager, $flashBag, $basePath);
+$trainerController = new TrainerController($userModel, $courseModel, $workshopModel, $twig, $userSession, $csrfTokenManager, $flashBag, $basePath);
+$adminController = new AdminController($userModel, $courseModel, $workshopModel, $twig, $userSession, $csrfTokenManager, $flashBag, $basePath);
+$profileController = new ProfileController($userModel, $twig, $userSession, $csrfTokenManager, $flashBag, $basePath);
+$contactController = new ContactController($twig, $userSession, $csrfTokenManager, $flashBag, $basePath);
 
 // Routage simple base sur l'URL.
 $path = parse_url($requestUri, PHP_URL_PATH) ?: '/';
 $path = stripBasePath($path, $basePath);
 
-$response = null;
-
-// Connexion / inscription / deconnexion.
-if ($path === '/login') {
-    $response = $authController->login($httpMethod);
-} elseif ($path === '/register') {
-    $response = $authController->register($httpMethod);
-} elseif ($path === '/logout' && $httpMethod === 'POST') {
-    $response = $authController->logout();
-} elseif ($path === '/lang' || str_starts_with($path, '/lang/')) {
-    $locale = trim(str_replace('/lang', '', $path), '/');
-    $response = $languageController->switch($locale);
-}
-
-// Catalogue / recherche.
-if ($response === null && $path === '/') {
-    $response = $homeController->index();
-} elseif ($response === null && $path === '/recherche') {
-    $response = $searchController->search();
-}
-
-// Cours et ateliers (fiche + inscriptions/avis).
-if ($response === null && preg_match('#^/cours/(\d+)$#', $path, $matches)) {
-    $response = $contentController->show('cours', (int) $matches[1], $httpMethod);
-} elseif ($response === null && preg_match('#^/atelier/(\d+)$#', $path, $matches)) {
-    $response = $contentController->show('atelier', (int) $matches[1], $httpMethod);
-}
-
-// Calendrier.
-if ($response === null && $path === '/calendrier') {
-    $response = $httpMethod === 'POST'
-        ? $calendarController->createEvent()
-        : $calendarController->index();
-} elseif ($response === null && preg_match('#^/calendrier/evenement/(\d+)$#', $path, $matches)) {
-    $response = $calendarController->showEvent((int) $matches[1]);
-} elseif ($response === null && preg_match('#^/calendrier/evenement/(\d+)/supprimer$#', $path, $matches) && $httpMethod === 'POST') {
-    $response = $calendarController->deleteEvent((int) $matches[1]);
-}
-
-// Espaces utilisateurs.
-if ($response === null && $path === '/espace') {
-    $response = $learnerController->dashboard($httpMethod);
-} elseif ($response === null && $path === '/formateur') {
-    $response = $trainerController->dashboard($httpMethod);
-} elseif ($response === null && preg_match('#^/formateur/(\d+)$#', $path, $matches)) {
-    $response = $trainerController->profile((int) $matches[1]);
-} elseif ($response === null && $path === '/admin') {
-    $response = $adminController->index($httpMethod);
-} elseif ($response === null && $path === '/profil') {
-    $response = $profileController->index($httpMethod);
-}
-
-// Contact.
-if ($response === null && $path === '/contact') {
-    $response = $contactController->index($httpMethod);
-}
-
-// Page non trouvée.
-if ($response === null) {
-    http_response_code(404);
-    echo 'Page non trouvée';
-    return;
-}
-
 try {
-    if (isset($response['redirect'])) {
-        header('Location: ' . buildPath($basePath, $response['redirect']));
-        http_response_code($response['status'] ?? 302);
+    // Connexion / inscription / deconnexion.
+    if ($path === '/login') {
+        $authController->login($httpMethod);
+        return;
+    }
+    if ($path === '/register') {
+        $authController->register($httpMethod);
+        return;
+    }
+    if ($path === '/logout' && $httpMethod === 'POST') {
+        $authController->logout();
+        return;
+    }
+    if ($path === '/lang' || str_starts_with($path, '/lang/')) {
+        $locale = trim(str_replace('/lang', '', $path), '/');
+        $languageController->switch($locale);
         return;
     }
 
-    $template = $response['template'] ?? null;
-    $context = $response['context'] ?? [];
-    $status = $response['status'] ?? 200;
-    $content = $response['content'] ?? '';
-
-    $flashes = $flashBag->all();
-    if ($template) {
-        $content = $twig->render($template, array_merge($context, [
-            'current_user' => $userSession->getUser(),
-            'is_logged_in' => $userSession->isLoggedIn(),
-            'csrf_logout' => $csrfTokenManager->getToken('logout'),
-            'flashes' => $flashes,
-            'base_path' => $basePath,
-        ]));
+    // Catalogue / recherche.
+    if ($path === '/') {
+        $homeController->index();
+        return;
+    }
+    if ($path === '/recherche') {
+        $searchController->search();
+        return;
     }
 
-    http_response_code($status);
-    echo $content;
+    // Cours et ateliers (fiche + inscriptions/avis).
+    if (preg_match('#^/cours/(\d+)$#', $path, $matches)) {
+        $contentController->show('cours', (int) $matches[1], $httpMethod);
+        return;
+    }
+    if (preg_match('#^/atelier/(\d+)$#', $path, $matches)) {
+        $contentController->show('atelier', (int) $matches[1], $httpMethod);
+        return;
+    }
+
+    // Calendrier.
+    if ($path === '/calendrier') {
+        if ($httpMethod === 'POST') {
+            $calendarController->createEvent();
+        } else {
+            $calendarController->index();
+        }
+        return;
+    }
+    if (preg_match('#^/calendrier/evenement/(\d+)$#', $path, $matches)) {
+        $calendarController->showEvent((int) $matches[1]);
+        return;
+    }
+    if (preg_match('#^/calendrier/evenement/(\d+)/supprimer$#', $path, $matches) && $httpMethod === 'POST') {
+        $calendarController->deleteEvent((int) $matches[1]);
+        return;
+    }
+
+    // Espaces utilisateurs.
+    if ($path === '/espace') {
+        $learnerController->dashboard($httpMethod);
+        return;
+    }
+    if ($path === '/formateur') {
+        $trainerController->dashboard($httpMethod);
+        return;
+    }
+    if (preg_match('#^/formateur/(\d+)$#', $path, $matches)) {
+        $trainerController->profile((int) $matches[1]);
+        return;
+    }
+    if ($path === '/admin') {
+        $adminController->index($httpMethod);
+        return;
+    }
+    if ($path === '/profil') {
+        $profileController->index($httpMethod);
+        return;
+    }
+
+    // Contact.
+    if ($path === '/contact') {
+        $contactController->index($httpMethod);
+        return;
+    }
 } catch (RuntimeException $exception) {
     if ($exception->getMessage() === 'AUTH_REQUIRED') {
         header('Location: ' . buildPath($basePath, '/login'));
@@ -187,6 +183,10 @@ try {
     }
     throw $exception;
 }
+
+// Page non trouvée.
+http_response_code(404);
+echo 'Page non trouvée';
 
 // Helpers simples pour le routage.
 function buildPath(string $basePath, string $path): string

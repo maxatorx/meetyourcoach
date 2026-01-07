@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Service\Translator;
+use Twig\Environment;
 
 /**
  * Changement de langue.
@@ -13,14 +14,16 @@ final class LanguageController extends AbstractController
 {
     public function __construct(
         private Translator $translator,
+        Environment $twig,
         \App\Security\UserSession $userSession,
         \App\Security\CsrfTokenManager $csrfTokenManager,
-        \App\Service\FlashBag $flashBag
+        \App\Service\FlashBag $flashBag,
+        string $basePath = ''
     ) {
-        parent::__construct($userSession, $csrfTokenManager, $flashBag);
+        parent::__construct($twig, $userSession, $csrfTokenManager, $flashBag, $basePath);
     }
 
-    public function switch(string $locale): array
+    public function switch(string $locale): void
     {
         // Changement de langue, puis retour a la page precedente.
         $this->translator->setLocale($locale);
@@ -40,7 +43,7 @@ final class LanguageController extends AbstractController
             $path .= '?' . $parts['query'];
         }
 
-        return $this->redirect($path);
+        $this->redirect($path);
     }
 
     private function detectBasePath(): string

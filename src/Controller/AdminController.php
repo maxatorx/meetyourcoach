@@ -13,6 +13,7 @@ use App\Security\CsrfTokenManager;
 use App\Security\UserSession;
 use App\Service\FlashBag;
 use DateTimeImmutable;
+use Twig\Environment;
 
 /**
  * Administration : roles + validation + edition.
@@ -23,14 +24,16 @@ final class AdminController extends AbstractController
         private UserModel $userModel,
         private CourseModel $courseModel,
         private WorkshopModel $workshopModel,
+        Environment $twig,
         UserSession $userSession,
         CsrfTokenManager $csrfTokenManager,
-        FlashBag $flashBag
+        FlashBag $flashBag,
+        string $basePath = ''
     ) {
-        parent::__construct($userSession, $csrfTokenManager, $flashBag);
+        parent::__construct($twig, $userSession, $csrfTokenManager, $flashBag, $basePath);
     }
 
-    public function index(string $httpMethod): array
+    public function index(string $httpMethod): void
     {
         $this->requireRole('admin');
 
@@ -45,7 +48,7 @@ final class AdminController extends AbstractController
         $pendingCourses = array_filter($courses, static fn (Course $course) => $course->getStatus() !== Course::STATUT_PUBLIE);
         $pendingWorkshops = array_filter($workshops, static fn (Workshop $workshop) => $workshop->getStatus() !== Workshop::STATUT_VALIDE);
 
-        return $this->render('admin/index.html.twig', [
+        $this->render('admin/index.html.twig', [
             'users' => $users,
             'courses' => $courses,
             'workshops' => $workshops,

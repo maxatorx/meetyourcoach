@@ -6,6 +6,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Model\UserModel;
+use Twig\Environment;
 
 /**
  * Gestion de l'inscription, connexion et déconnexion.
@@ -14,31 +15,35 @@ final class AuthController extends AbstractController
 {
     public function __construct(
         private UserModel $userModel,
+        Environment $twig,
         \App\Security\UserSession $userSession,
         \App\Security\CsrfTokenManager $csrfTokenManager,
-        \App\Service\FlashBag $flashBag
+        \App\Service\FlashBag $flashBag,
+        string $basePath = ''
     ) {
-        parent::__construct($userSession, $csrfTokenManager, $flashBag);
+        parent::__construct($twig, $userSession, $csrfTokenManager, $flashBag, $basePath);
     }
 
-    public function register(string $httpMethod): array
+    public function register(string $httpMethod): void
     {
         // Affiche le formulaire ou traite l'inscription.
         if ($httpMethod === 'POST') {
-            return $this->handleRegister();
+            $this->handleRegister();
+            return;
         }
 
-        return $this->render('auth/register.html.twig', [
+        $this->render('auth/register.html.twig', [
             'csrf_token' => $this->csrfTokenManager->getToken('register'),
         ]);
     }
 
-    private function handleRegister(): array
+    private function handleRegister(): void
     {
         $token = $_POST['csrf_token'] ?? '';
         if (!$this->csrfTokenManager->validateToken($token, 'register')) {
             $this->flashBag->add('danger', 'Jeton CSRF invalide.');
-            return $this->redirect('/register');
+            $this->redirect('/register');
+            return;
         }
 
         $firstName = trim($_POST['prenom'] ?? '');
@@ -49,7 +54,8 @@ final class AuthController extends AbstractController
 
         if ($password !== $passwordConfirm) {
             $this->flashBag->add('danger', 'Les mots de passe ne correspondent pas.');
-            return $this->redirect('/register');
+            $this->redirect('/register');
+            return;
         }
 
         // Un nouvel utilisateur ne peut etre que apprenant ou formateur.
@@ -62,12 +68,14 @@ final class AuthController extends AbstractController
             $user = new User($firstName, $lastName, $email, $password, $role);
         } catch (\Throwable $exception) {
             $this->flashBag->add('danger', $exception->getMessage());
-            return $this->redirect('/register');
+            $this->redirect('/register');
+            return;
         }
 
         if ($this->userModel->findByEmail($user->getEmail())) {
             $this->flashBag->add('danger', 'Un compte existe déjà avec cet email.');
-            return $this->redirect('/register');
+            $this->redirect('/register');
+            return;
         }
 
         if ($photoPath = $this->handlePhotoUpload()) {
@@ -77,27 +85,29 @@ final class AuthController extends AbstractController
         $this->userModel->create($user);
         $this->flashBag->add('success', 'Inscription réussie. Vous pouvez vous connecter.');
 
-        return $this->redirect('/login');
+        $this->redirect('/login');
     }
 
-    public function login(string $httpMethod): array
+    public function login(string $httpMethod): void
     {
         // Affiche le formulaire ou traite la connexion.
         if ($httpMethod === 'POST') {
-            return $this->handleLogin();
+            $this->handleLogin();
+            return;
         }
 
-        return $this->render('auth/login.html.twig', [
+        $this->render('auth/login.html.twig', [
             'csrf_token' => $this->csrfTokenManager->getToken('login'),
         ]);
     }
 
-    private function handleLogin(): array
+    private function handleLogin(): void
     {
         $token = $_POST['csrf_token'] ?? '';
         if (!$this->csrfTokenManager->validateToken($token, 'login')) {
             $this->flashBag->add('danger', 'Jeton CSRF invalide.');
-            return $this->redirect('/login');
+            $this->redirect('/login');
+            return;
         }
 
         $email = strtolower(trim($_POST['email'] ?? ''));
@@ -107,7 +117,8 @@ final class AuthController extends AbstractController
         $user = $this->userModel->findByEmail($email);
         if (!$user || !password_verify($password, $user->getPasswordHash())) {
             $this->flashBag->add('danger', 'Identifiants invalides.');
-            return $this->redirect('/login');
+            $this->redirect('/login');
+            return;
         }
 
         // Connexion : session + option "se souvenir de moi".
@@ -130,23 +141,24 @@ final class AuthController extends AbstractController
         }
 
         $this->flashBag->add('success', 'Connexion réussie.');
-        return $this->redirect('/');
+        $this->redirect('/');
     }
 
-    public function logout(): array
+    public function logout(): void
     {
         // Déconnexion via POST.
         $token = $_POST['csrf_token'] ?? '';
         if (!$this->csrfTokenManager->validateToken($token, 'logout')) {
             $this->flashBag->add('danger', 'Jeton CSRF invalide.');
-            return $this->redirect('/');
+            $this->redirect('/');
+            return;
         }
 
         $this->userSession->logout();
         setcookie('myc_remember', '', time() - 3600, '/');
         $this->flashBag->add('success', 'Vous êtes déconnecté.');
 
-        return $this->redirect('/');
+        $this->redirect('/');
     }
 
     private function handlePhotoUpload(): ?string

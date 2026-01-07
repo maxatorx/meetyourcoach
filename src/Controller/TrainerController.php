@@ -12,6 +12,7 @@ use App\Model\WorkshopModel;
 use App\Security\CsrfTokenManager;
 use App\Security\UserSession;
 use App\Service\FlashBag;
+use Twig\Environment;
 
 /**
  * Espace formateur : CRUD cours/ateliers.
@@ -22,33 +23,36 @@ final class TrainerController extends AbstractController
         private UserModel $userModel,
         private CourseModel $courseModel,
         private WorkshopModel $workshopModel,
+        Environment $twig,
         UserSession $userSession,
         CsrfTokenManager $csrfTokenManager,
-        FlashBag $flashBag
+        FlashBag $flashBag,
+        string $basePath = ''
     ) {
-        parent::__construct($userSession, $csrfTokenManager, $flashBag);
+        parent::__construct($twig, $userSession, $csrfTokenManager, $flashBag, $basePath);
     }
 
-    public function profile(int $id): array
+    public function profile(int $id): void
     {
         $trainer = $this->userModel->findById($id);
         $courses = $this->courseModel->findByTrainer($id);
         $workshops = $this->workshopModel->findByTrainer($id);
 
         if ($trainer === null) {
-            return $this->render('trainer/profile.html.twig', [
+            $this->render('trainer/profile.html.twig', [
                 'trainer' => null,
             ], 404);
+            return;
         }
 
-        return $this->render('trainer/profile.html.twig', [
+        $this->render('trainer/profile.html.twig', [
             'trainer' => $trainer,
             'courses' => $courses,
             'workshops' => $workshops,
         ]);
     }
 
-    public function dashboard(string $httpMethod): array
+    public function dashboard(string $httpMethod): void
     {
         $this->requireRole('formateur');
 
@@ -62,7 +66,7 @@ final class TrainerController extends AbstractController
         $editCourse = $this->prepareCourseEdit($trainerId);
         $editWorkshop = $this->prepareWorkshopEdit($trainerId);
 
-        return $this->render('trainer/dashboard.html.twig', [
+        $this->render('trainer/dashboard.html.twig', [
             'courses' => $courses,
             'workshops' => $workshops,
             'csrf_token' => $this->csrfTokenManager->getToken('trainer_dashboard'),

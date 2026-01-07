@@ -12,6 +12,7 @@ use App\Model\WorkshopModel;
 use App\Security\UserSession;
 use App\Security\CsrfTokenManager;
 use App\Service\FlashBag;
+use Twig\Environment;
 
 /**
  * Espace apprenant (profil + inscriptions + avis).
@@ -24,14 +25,16 @@ final class LearnerController extends AbstractController
         private ReviewModel $reviewModel,
         private CourseModel $courseModel,
         private WorkshopModel $workshopModel,
+        Environment $twig,
         UserSession $userSession,
         CsrfTokenManager $csrfTokenManager,
-        FlashBag $flashBag
+        FlashBag $flashBag,
+        string $basePath = ''
     ) {
-        parent::__construct($userSession, $csrfTokenManager, $flashBag);
+        parent::__construct($twig, $userSession, $csrfTokenManager, $flashBag, $basePath);
     }
 
-    public function dashboard(string $httpMethod): array
+    public function dashboard(string $httpMethod): void
     {
         $this->requireRole('apprenant');
 
@@ -61,7 +64,7 @@ final class LearnerController extends AbstractController
         }
         $reviews = $this->reviewModel->findByUser((int) $user['id']);
 
-        return $this->render('learner/dashboard.html.twig', [
+        $this->render('learner/dashboard.html.twig', [
             'enrolled_courses' => $enrolledCourses,
             'enrolled_workshops' => $enrolledWorkshops,
             'my_reviews' => $reviews,
