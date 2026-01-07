@@ -1,0 +1,282 @@
+{
+    "calendar": {
+        "heading_prefix": "Calendrier de",
+        "months": {
+            "1": "janvier",
+            "2": "février",
+            "3": "mars",
+            "4": "avril",
+            "5": "mai",
+            "6": "juin",
+            "7": "juillet",
+            "8": "août",
+            "9": "septembre",
+            "10": "octobre",
+            "11": "novembre",
+            "12": "décembre"
+        },
+        "add_event_button": "Ajouter un événement",
+        "login_cta": "Connectez-vous pour ajouter un événement",
+        "intro": {
+            "default": "Consultez les ateliers publics ouverts aux inscriptions ce mois-ci.",
+            "apprenant": "Retrouvez vos inscriptions et ajoutez vos propres rappels pour ne rien oublier.",
+            "formateur": "Visualisez vos ateliers planifiés et ajoutez vos rendez-vous clés."
+        },
+        "weekdays": {
+            "mon": "Lundi",
+            "tue": "Mardi",
+            "wed": "Mercredi",
+            "thu": "Jeudi",
+            "fri": "Vendredi",
+            "sat": "Samedi",
+            "sun": "Dimanche"
+        },
+        "table": {
+            "no_events": "Aucun événement n'est enregistré pour ce mois. Revenez un peu plus tard ou changez de période."
+        },
+        "labels": {
+            "platform": "Plateforme",
+            "personal": "Personnel"
+        },
+        "form": {
+            "title": "Ajouter un événement",
+            "fields": {
+                "title": "Titre",
+                "datetime": "Date & heure",
+                "location": "Lieu",
+                "description": "Description"
+            },
+            "actions": {
+                "cancel": "Annuler",
+                "save": "Enregistrer"
+            }
+        },
+        "modal": {
+            "personal": {
+                "badge": "Événement personnel",
+                "no_description": "Aucune description pour cet événement personnel.",
+                "delete_button": "Supprimer",
+                "delete_confirm": "Supprimer cet événement ?"
+            }
+        },
+        "event": {
+            "not_found": "Événement introuvable.",
+            "back": "Retour au calendrier"
+        }
+    },
+    "language": {
+        "switch_label": "Langue"
+    },
+    "navigation": {
+        "home": "Accueil",
+        "calendar": "Calendrier",
+        "login": "Connexion",
+        "register": "Inscription",
+        "search": "Recherche",
+        "catalog": "Catalogue",
+        "learner_space": "Mon espace",
+        "trainer_space": "Espace Formateur",
+        "admin": "Administration",
+        "profile": "Profil",
+        "advanced_search": "Recherche avancée"
+    },
+    "home": {
+        "hero": {
+            "badge": "Plateforme éducative",
+            "title": "Progressez avec des coachs inspirants",
+            "subtitle": "Développez vos compétences clés grâce à des cursus courts, des ateliers pratiques et le mentorat de formateurs certifiés.",
+            "cta_primary": "Commencer maintenant",
+            "cta_secondary": "Explorer le catalogue",
+            "reasons_title": "Pourquoi MeetYourCoach ?",
+            "reasons": {
+                "1": "Sessions live et replays",
+                "2": "Accompagnement personnalisé",
+                "3": "Parcours certifiants"
+            }
+        },
+        "filters": {
+            "all": "Tout",
+            "courses": "Cours",
+            "workshops": "Ateliers"
+        },
+        "section_title": "Sélections pour vous",
+        "card": {
+            "level": "Niveau : %level%",
+            "date": "Date : %date%",
+            "price": "%price% €",
+            "view": "Voir le détail"
+        },
+        "empty": "Aucun contenu disponible."
+    },
+    "content": {
+        "type": {
+            "cours": "Cours",
+            "atelier": "Atelier"
+        }
+    },
+    "pagination": {
+        "prev": "Précédent",
+        "next": "Suivant"
+    },
+    "search": {
+        "title": "Recherche",
+        "fields": {
+            "title": "Titre",
+            "type": "Type",
+            "level": "Niveau",
+            "date": "Date (atelier)"
+        },
+        "options": {
+            "all": "Tous",
+            "course": "Cours",
+            "workshop": "Atelier",
+            "levels": {
+                "debutant": "Débutant",
+                "intermediaire": "Intermédiaire",
+                "avance": "Avancé"
+            }
+        },
+        "filter_button": "Filtrer",
+        "card": {
+            "type_course": "Cours",
+            "type_workshop": "Atelier",
+            "price": "%price% €",
+            "view": "Voir"
+        },
+        "empty": "Aucun résultat."
+    },
+    "footer": {
+        "tagline": "Des parcours courts, des coachs passionnés et un accompagnement personnalisé pour accélérer vos compétences.",
+        "navigation_title": "Navigation",
+        "contact_title": "Contact",
+        "contact_text": "Besoin d'un plan de formation ? Parlons-en.",
+        "contact_cta": "Planifier un échange",
+        "badges": {
+            "pro": "Pro",
+            "mentoring": "Mentorat",
+            "education": "Éducation"
+        },
+        "copyright": "© %year% MeetYourCoach. Tous droits réservés."
+    },
+    "trainer": {
+        "title": "Espace Formateur",
+        "forms": {
+            "course": {
+                "create": "Créer un cours",
+                "edit": "Modifier le cours",
+                "fields": {
+                    "title": "Titre",
+                    "description": "Description",
+                    "price": "Prix",
+                    "level": "Niveau",
+                    "image": "Image"
+                },
+                "levels": {
+                    "debutant": "Débutant",
+                    "intermediaire": "Intermédiaire",
+                    "avance": "Avancé"
+                }
+            },
+            "workshop": {
+                "create": "Créer un atelier",
+                "edit": "Modifier l'atelier",
+                "fields": {
+                    "title": "Titre",
+                    "description": "Description",
+                    "price": "Prix",
+                    "date": "Date",
+                    "duration": "Durée (min)",
+                    "capacity": "Places",
+                    "location": "Lieu",
+                    "image": "Image"
+                }
+            },
+            "shared": {
+                "current_image": "Image actuelle : %link%"
+            },
+            "actions": {
+                "submit": "Soumettre",
+                "update": "Mettre à jour",
+                "cancel": "Annuler"
+            }
+        },
+        "lists": {
+            "courses": "Mes cours",
+            "workshops": "Mes ateliers",
+            "empty_courses": "Aucun cours pour l'instant.",
+            "empty_workshops": "Vous n'avez pas encore créé d'atelier.",
+            "edit": "Modifier",
+            "delete": "Supprimer",
+            "confirm_course": "Supprimer ce cours ?",
+            "confirm_workshop": "Supprimer cet atelier ?",
+            "view": "voir"
+        }
+    },
+    "contact": {
+        "title": "Planifier un échange",
+        "hero": {
+            "badge": "On échange ?",
+            "heading": "Planifions votre session découverte",
+            "text": "Expliquez-nous vos objectifs (upskilling, coaching individuel, ateliers d'équipe). Un coach MeetYourCoach vous recontacte sous 24h pour préparer un plan d'action et un créneau dédié.",
+            "points": {
+                "1": "✔ Créneau personnalisé (visio ou présentiel)",
+                "2": "✔ Diagnostic de vos besoins",
+                "3": "✔ Proposition pédagogique sur-mesure"
+            }
+        },
+        "form": {
+            "badge": "Contact express",
+            "title": "Laissez-nous vos coordonnées",
+            "fields": {
+                "name": "Nom complet *",
+                "email": "E-mail professionnel *",
+                "goal": "Objectif & contexte *",
+                "slot": "Créneau souhaité",
+                "slot_placeholder": "Choisir...",
+                "slot_morning": "Matinée (9h-12h)",
+                "slot_afternoon": "Après-midi (14h-17h)",
+                "slot_evening": "Soirée (18h-20h)"
+            },
+            "placeholders": {
+                "name": "Alex Martin",
+                "email": "vous@entreprise.com",
+                "goal": "Ex : coaching leadership pour mon équipe Produit"
+            },
+            "submit": "Envoyer ma demande",
+            "disclaimer": "En soumettant ce formulaire, vous acceptez d'être recontacté(e) par l'équipe MeetYourCoach."
+        },
+        "cards": {
+            "visio_badge": "Visio",
+            "visio_title": "Session stratégique (30 min)",
+            "visio_text": "Analyse de vos enjeux, parcours recommandé et estimation budgétaire.",
+            "mentoring_badge": "Mentorat",
+            "mentoring_title": "Match avec un coach",
+            "mentoring_text": "Sélection d'un formateur adapté à votre secteur et à vos objectifs.",
+            "follow_badge": "Suivi",
+            "follow_title": "Plan d'action",
+            "follow_text": "Livraison d'un plan de progression sur-mesure et prochaines étapes."
+        }
+    },
+    "profile": {
+        "title": "Mon profil",
+        "avatar_alt": "Avatar",
+        "no_bio": "Aucune biographie pour le moment.",
+        "logout": "Se déconnecter",
+        "public_section": "Mon profil public",
+        "fields": {
+            "first_name": "Prénom",
+            "last_name": "Nom",
+            "bio": "Biographie",
+            "photo": "Photo de profil"
+        },
+        "photo_hint": "Laissez vide pour conserver la photo actuelle.",
+        "save": "Sauvegarder le profil"
+    },
+    "learner": {
+        "reviews": {
+            "badge": "Avis",
+            "title": "Mes avis",
+            "empty": "Vous n'avez pas encore laissé d'avis."
+        }
+    }
+}

@@ -1,0 +1,62 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Formateur · MeetYourCoach{% endblock %}
+
+{% block content %}
+{% if not trainer %}
+    <p>Formateur introuvable.</p>
+{% else %}
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card">
+                {% if trainer.photo %}
+                    {% set trainer_image = asset(trainer.photo) %}
+                {% else %}
+                    {% set trainer_image = 'https://via.placeholder.com/400x300?text=Formateur' %}
+                {% endif %}
+                <img src="{{ trainer_image }}" class="card-img-top" alt="{{ trainer.firstName }}">
+                <div class="card-body">
+                    <h1 class="h4">{{ trainer.firstName }} {{ trainer.lastName }}</h1>
+                    {% set bio_paragraphs = trainer.bio ? trainer.bio|split('\n') : [] %}
+                    {% set bio_has_paragraph = false %}
+                    <div class="text-muted d-grid gap-2">
+                        {% for paragraph in bio_paragraphs %}
+                            {% set trimmed = paragraph|trim %}
+                            {% if trimmed != '' %}
+                                {% set bio_has_paragraph = true %}
+                                <p class="mb-0">{{ trimmed|autotrans }}</p>
+                            {% endif %}
+                        {% endfor %}
+                        {% if not bio_has_paragraph %}
+                            <p class="mb-0">{{ (trainer.bio ?? 'Formateur indépendant')|autotrans }}</p>
+                        {% endif %}
+                    </div>
+                    <p class="mb-0">{{ ('Contact : ' ~ trainer.email)|autotrans }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <h2 class="h5">{{ 'Cours publiés'|autotrans }}</h2>
+            <div class="list-group mb-4">
+                {% for course in courses %}
+                    <a class="list-group-item list-group-item-action" href="{{ path('cours/' ~ course.id) }}">
+                        <div class="d-flex justify-content-between"><span>{{ course.title|autotrans }}</span><span class="badge bg-secondary">{{ course.status|autotrans }}</span></div>
+                    </a>
+                {% else %}
+                    <p class="text-muted">{{ 'Aucun cours pour le moment.'|autotrans }}</p>
+                {% endfor %}
+            </div>
+            <h2 class="h5">{{ 'Ateliers'|autotrans }}</h2>
+            <div class="list-group">
+                {% for workshop in workshops %}
+                    <a class="list-group-item list-group-item-action" href="{{ path('atelier/' ~ workshop.id) }}">
+                        <div class="d-flex justify-content-between"><span>{{ workshop.title|autotrans }}</span><span class="badge bg-info text-dark">{{ workshop.status|autotrans }}</span></div>
+                    </a>
+                {% else %}
+                    <p class="text-muted">{{ 'Aucun atelier enregistré.'|autotrans }}</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

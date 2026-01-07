@@ -1,0 +1,17 @@
+{
+    "name": "meetyourcoach/platform",
+    "description": "MeetYourCoach training catalog",
+    "type": "project",
+    "require": {
+        "php": ">=8.1",
+        "twig/twig": "^3.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        },
+        "files": [
+            "config/database.php"
+        ]
+    }
+}

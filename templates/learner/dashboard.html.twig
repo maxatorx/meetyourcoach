@@ -1,0 +1,93 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Mon espace · MeetYourCoach{% endblock %}
+
+{% block content %}
+<section class="myc-dashboard-hero">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div>
+            <p class="text-uppercase small text-muted mb-1">Mon espace</p>
+            <h1 class="h4 mb-2">Bonjour {{ current_user.first_name ?? 'coaché·e' }}</h1>
+            <p class="mb-0 myc-muted">Gérez votre profil, retrouvez vos cours et ateliers, puis continuez votre progression.</p>
+        </div>
+        <a href="{{ path('/') }}" class="btn btn-outline-primary px-4">Voir le catalogue</a>
+    </div>
+</section>
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="card myc-card h-100">
+            <div class="card-body">
+                <p class="text-muted mb-0">Retrouvez vos réglages détaillés dans la page Profil.</p>
+                <a class="btn btn-outline-primary w-100 mt-3" href="{{ path('profil') }}">Aller à mon profil</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="card myc-card myc-enrollment-card mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <p class="badge badge-rounded badge-cours mb-1">Cours inscrits</p>
+                        <h2 class="h5 mb-0">Vos cours en cours</h2>
+                    </div>
+                </div>
+                {% if enrolled_courses %}
+                    {% for course in enrolled_courses %}
+                        <div class="myc-enrollment-item">
+                            <div>
+                                <p class="fw-semibold mb-1">{{ course.title }}</p>
+                                <p class="small text-muted mb-1">Niveau : {{ course.level|replace({'_':' '})|title }}</p>
+                                <p class="small text-muted mb-0">Tarif : {{ course.price|number_format(2, ',', ' ') }} €</p>
+                            </div>
+                            <a class="btn btn-sm btn-outline-primary" href="{{ path('cours/' ~ course.id) }}">Continuer</a>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted mb-0">Vous n'êtes inscrit à aucun cours pour le moment.</p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card myc-card myc-enrollment-card mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <p class="badge badge-rounded badge-atelier mb-1">Ateliers inscrits</p>
+                        <h2 class="h5 mb-0">Vos ateliers à venir</h2>
+                    </div>
+                </div>
+                {% if enrolled_workshops %}
+                    {% for workshop in enrolled_workshops %}
+                        <div class="myc-enrollment-item">
+                            <div>
+                                <p class="fw-semibold mb-1">{{ workshop.title }}</p>
+                                <p class="small text-muted mb-1">Date : {{ workshop.scheduledAt|date('d/m/Y H:i') }} · {{ workshop.location }}</p>
+                                <p class="small text-muted mb-0">{{ workshop.nbInscrits }}/{{ workshop.nbPlaces }} inscrits · {{ workshop.price|number_format(2, ',', ' ') }} €</p>
+                            </div>
+                            <a class="btn btn-sm btn-outline-primary" href="{{ path('atelier/' ~ workshop.id) }}">Détails</a>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted mb-0">Aucun atelier planifié pour l'instant.</p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card myc-card">
+            <div class="card-body">
+                <p class="badge badge-rounded text-bg-light text-muted mb-3">{{ trans('learner.reviews.badge') }}</p>
+                <h2 class="h5">{{ trans('learner.reviews.title') }}</h2>
+                {% for review in my_reviews %}
+                    <div class="myc-enrollment-item flex-column align-items-start">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span class="myc-chip">{{ review.rating }}/5</span>
+                            <small class="text-muted">{{ review.createdAt|date('d/m/Y') }}</small>
+                        </div>
+                        <p class="mb-0">{{ review.comment|autotrans }}</p>
+                    </div>
+                {% else %}
+                    <p class="mb-0 text-muted">{{ trans('learner.reviews.empty') }}</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

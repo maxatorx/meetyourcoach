@@ -1,0 +1,161 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Calendrier · MeetYourCoach{% endblock %}
+
+{% block content %}
+<section id="events" class="myc-calendar-section rounded-4 shadow-lg p-4 p-md-5">
+    <div class="d-flex flex-wrap justify-content-center align-items-center gap-3 myc-calendar-header">
+        <a class="btn btn-primary mx-2 btn-lg myc-calendar-nav" style="font-size: 1rem; padding: 5px 15px;" href="{{ path('calendrier', {'month': prev.month, 'year': prev.year}) }}" aria-label="Mois précédent">
+            &lt;
+        </a>
+        <h1 class="myc-calendar-title text-white fw-bold text-uppercase letter-spacing-2 mb-0 text-center" style="font-size: 2rem;" data-i18n="calendar.heading">
+            {{ trans('calendar.heading_prefix') }} {{ current_month_label }}
+        </h1>
+        <a class="btn btn-primary mx-2 btn-lg myc-calendar-nav" style="font-size: 1rem; padding: 5px 15px;" href="{{ path('calendrier', {'month': next.month, 'year': next.year}) }}" aria-label="Mois suivant">
+            &gt;
+        </a>
+    </div>
+    <p class="text-white-50 small mb-2 text-center mt-2">{{ trans(calendar_intro_key) }}</p>
+    <div class="text-center mb-3">
+        {% if can_add_event %}
+            <button class="btn btn-outline-light px-4" data-bs-toggle="modal" data-bs-target="#addEventModal">{{ trans('calendar.add_event_button') }}</button>
+        {% else %}
+            <a class="btn btn-outline-light px-4" href="{{ path('login') }}">{{ trans('calendar.login_cta') }}</a>
+        {% endif %}
+    </div>
+
+    <div class="calendar table-responsive mt-4">
+        {% set weekdays = [
+            'calendar.weekdays.mon',
+            'calendar.weekdays.tue',
+            'calendar.weekdays.wed',
+            'calendar.weekdays.thu',
+            'calendar.weekdays.fri',
+            'calendar.weekdays.sat',
+            'calendar.weekdays.sun'
+        ] %}
+        <table class="table table-bordered myc-calendar-table mb-0">
+            <thead>
+                <tr>
+                    {% for label in weekdays %}
+                        <th class="text-primary fs-5 text-center myc-calendar-weekday" scope="col">{{ trans(label) }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for week in calendar_weeks %}
+                    <tr>
+                        {% for cell in week %}
+                            <td class="align-top {{ cell.is_current_month ? '' : 'myc-calendar-out-month' }}">
+                                <div class="myc-calendar-day">{{ cell.day }}</div>
+                                {% if cell.events %}
+                                    <div class="myc-calendar-events">
+                                        {% for event in cell.events %}
+                                            {% set is_custom = event.context == 'custom' %}
+                                            {% set chip_label = is_custom ? trans('calendar.labels.personal') : trans('calendar.labels.platform') %}
+                                            {% set chip_class = is_custom ? 'custom' : 'platform' %}
+                                            {% if is_custom %}
+                                                <button type="button"
+                                                        class="myc-calendar-event {{ 'myc-calendar-event--' ~ event.context }}"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#customEvent{{ event.id }}">
+                                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                                        <span class="myc-calendar-event-title">{{ event.title }}</span>
+                                                        <span class="myc-calendar-chip myc-calendar-chip--{{ chip_class }}">{{ chip_label }}</span>
+                                                    </div>
+                                                    <small class="d-block">{{ event.subtitle }}</small>
+                                                    <small class="d-block text-muted">{{ event.date|date('H\\hi') }}{% if event.location %} · {{ event.location }}{% endif %}</small>
+                                                </button>
+                                            {% else %}
+                                                <a class="myc-calendar-event {{ 'myc-calendar-event--' ~ event.context }}"
+                                                   href="{{ event.cta ? path(event.cta) : path('calendrier') }}">
+                                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                                        <span class="myc-calendar-event-title">{{ event.title }}</span>
+                                                        <span class="myc-calendar-chip myc-calendar-chip--{{ chip_class }}">{{ chip_label }}</span>
+                                                    </div>
+                                                    <small class="d-block">{{ event.subtitle }}</small>
+                                                    <small class="d-block text-muted">{{ event.date|date('H\\hi') }}{% if event.location %} · {{ event.location }}{% endif %}</small>
+                                                </a>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if is_empty %}
+        <div class="alert alert-info mt-4 mb-0">
+            {{ trans('calendar.table.no_events') }}
+        </div>
+    {% endif %}
+</section>
+
+{% if can_add_event %}
+    <div class="modal fade" id="addEventModal" tabindex="-1" aria-labelledby="addEventLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title h5" id="addEventLabel">{{ trans('calendar.form.title') }}</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <form method="post" action="{{ path('calendrier') }}">
+                    <div class="modal-body">
+                        <input type="hidden" name="csrf_token" value="{{ add_event_csrf }}">
+                        <div class="mb-3">
+                            <label class="form-label">{{ trans('calendar.form.fields.title') }}</label>
+                            <input type="text" name="titre" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">{{ trans('calendar.form.fields.datetime') }}</label>
+                            <input type="datetime-local" name="date" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">{{ trans('calendar.form.fields.location') }}</label>
+                            <input type="text" name="lieu" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">{{ trans('calendar.form.fields.description') }}</label>
+                            <textarea name="description" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ trans('calendar.form.actions.cancel') }}</button>
+                        <button type="submit" class="btn btn-primary">{{ trans('calendar.form.actions.save') }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+{% for event in custom_events %}
+    <div class="modal fade" id="customEvent{{ event.id }}" tabindex="-1" aria-labelledby="customEventLabel{{ event.id }}" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title h5" id="customEventLabel{{ event.id }}">{{ event.title }}</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-1"><strong>Date :</strong> {{ event.date|date('d/m/Y H\\hi') }}</p>
+                    {% if event.location %}
+                        <p class="mb-1"><strong>Lieu :</strong> {{ event.location }}</p>
+                    {% endif %}
+                    <p class="mb-0">{{ event.description|default(trans('calendar.modal.personal.no_description')) }}</p>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <span class="badge text-bg-secondary">{{ trans('calendar.modal.personal.badge') }}</span>
+                    <form method="post" action="{{ path(event.delete_path) }}" onsubmit="return confirm('{{ trans('calendar.modal.personal.delete_confirm') }}');">
+                        <input type="hidden" name="csrf_token" value="{{ event.delete_token }}">
+                        <button type="submit" class="btn btn-outline-danger">{{ trans('calendar.modal.personal.delete_button') }}</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+{% endblock %}

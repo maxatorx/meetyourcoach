@@ -1,0 +1,53 @@
+<nav class="navbar navbar-expand-lg navbar-dark myc-navbar py-3">
+    <div class="container">
+        <a class="navbar-brand brand-pill" href="{{ path('/') }}">
+            <img src="{{ asset('assets/images/meetyourcoach.png') }}" alt="MeetYourCoach">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" href="{{ path('/') }}">{{ trans('navigation.home') }}</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ path('calendrier') }}">{{ trans('navigation.calendar') }}</a></li>
+                {% if not is_logged_in %}
+                    <li class="nav-item"><a class="nav-link" href="{{ path('login') }}">{{ trans('navigation.login') }}</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ path('register') }}">{{ trans('navigation.register') }}</a></li>
+                {% else %}
+                    {% if current_user.role == 'apprenant' %}
+                        <li class="nav-item"><a class="nav-link" href="{{ path('recherche') }}">{{ trans('navigation.search') }}</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ path('espace') }}">{{ trans('navigation.learner_space') }}</a></li>
+                    {% elseif current_user.role == 'formateur' %}
+                        <li class="nav-item"><a class="nav-link" href="{{ path('recherche') }}">{{ trans('navigation.search') }}</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ path('formateur') }}">{{ trans('navigation.trainer_space') }}</a></li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{{ path('admin') }}">{{ trans('navigation.admin') }}</a></li>
+                    {% endif %}
+                {% endif %}
+            </ul>
+            <div class="d-flex align-items-center gap-2 ms-lg-3">
+                <div class="btn-group" role="group" aria-label="{{ trans('language.switch_label') }}">
+                    {% for locale in available_locales %}
+                        {% set is_active = locale == current_locale %}
+                        <a class="btn btn-sm {{ is_active ? 'btn-primary' : 'btn-outline-light' }}"
+                           href="{{ path('lang/' ~ locale) }}">
+                            {{ locale|upper }}
+                        </a>
+                    {% endfor %}
+                </div>
+                {% if is_logged_in %}
+                    {% if current_user.photo %}
+                        {% set avatar = asset(current_user.photo) %}
+                    {% else %}
+                        {% set avatar = 'https://via.placeholder.com/40x40?text=ME' %}
+                    {% endif %}
+                    <div>
+                        <a href="{{ path('profil') }}" class="d-flex align-items-center text-decoration-none">
+                            <img src="{{ avatar }}" alt="Profil" class="rounded-circle border border-light myc-avatar" width="40" height="40">
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>

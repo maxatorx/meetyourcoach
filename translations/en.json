@@ -1,0 +1,282 @@
+{
+    "calendar": {
+        "heading_prefix": "Calendar for",
+        "months": {
+            "1": "January",
+            "2": "February",
+            "3": "March",
+            "4": "April",
+            "5": "May",
+            "6": "June",
+            "7": "July",
+            "8": "August",
+            "9": "September",
+            "10": "October",
+            "11": "November",
+            "12": "December"
+        },
+        "add_event_button": "Add event",
+        "login_cta": "Log in to add an event",
+        "intro": {
+            "default": "Browse the public workshops open for registration this month.",
+            "apprenant": "See your registrations and add your own reminders so you never miss a session.",
+            "formateur": "Review your scheduled workshops and add your personal milestones."
+        },
+        "weekdays": {
+            "mon": "Monday",
+            "tue": "Tuesday",
+            "wed": "Wednesday",
+            "thu": "Thursday",
+            "fri": "Friday",
+            "sat": "Saturday",
+            "sun": "Sunday"
+        },
+        "table": {
+            "no_events": "No events recorded for this month. Come back later or change the period."
+        },
+        "labels": {
+            "platform": "Platform",
+            "personal": "Personal"
+        },
+        "form": {
+            "title": "Add an event",
+            "fields": {
+                "title": "Title",
+                "datetime": "Date & time",
+                "location": "Location",
+                "description": "Description"
+            },
+            "actions": {
+                "cancel": "Cancel",
+                "save": "Save"
+            }
+        },
+        "modal": {
+            "personal": {
+                "badge": "Personal event",
+                "no_description": "No description for this personal event.",
+                "delete_button": "Delete",
+                "delete_confirm": "Delete this event?"
+            }
+        },
+        "event": {
+            "not_found": "Event not found.",
+            "back": "Back to calendar"
+        }
+    },
+    "language": {
+        "switch_label": "Language"
+    },
+    "navigation": {
+        "home": "Home",
+        "calendar": "Calendar",
+        "login": "Log in",
+        "register": "Sign up",
+        "search": "Search",
+        "catalog": "Catalog",
+        "learner_space": "My dashboard",
+        "trainer_space": "Trainer space",
+        "admin": "Admin",
+        "profile": "Profile",
+        "advanced_search": "Advanced search"
+    },
+    "home": {
+        "hero": {
+            "badge": "Learning platform",
+            "title": "Grow with inspiring coaches",
+            "subtitle": "Level up your key skills through short programs, hands-on workshops, and mentoring from certified trainers.",
+            "cta_primary": "Get started",
+            "cta_secondary": "Browse the catalog",
+            "reasons_title": "Why MeetYourCoach?",
+            "reasons": {
+                "1": "Live sessions & replays",
+                "2": "Personalized support",
+                "3": "Certification-ready tracks"
+            }
+        },
+        "filters": {
+            "all": "All",
+            "courses": "Courses",
+            "workshops": "Workshops"
+        },
+        "section_title": "Featured for you",
+        "card": {
+            "level": "Level: %level%",
+            "date": "Date: %date%",
+            "price": "€%price%",
+            "view": "View details"
+        },
+        "empty": "No content available."
+    },
+    "content": {
+        "type": {
+            "cours": "Course",
+            "atelier": "Workshop"
+        }
+    },
+    "pagination": {
+        "prev": "Previous",
+        "next": "Next"
+    },
+    "search": {
+        "title": "Search",
+        "fields": {
+            "title": "Title",
+            "type": "Type",
+            "level": "Level",
+            "date": "Date (workshop)"
+        },
+        "options": {
+            "all": "All",
+            "course": "Course",
+            "workshop": "Workshop",
+            "levels": {
+                "debutant": "Beginner",
+                "intermediaire": "Intermediate",
+                "avance": "Advanced"
+            }
+        },
+        "filter_button": "Filter",
+        "card": {
+            "type_course": "Course",
+            "type_workshop": "Workshop",
+            "price": "€%price%",
+            "view": "View"
+        },
+        "empty": "No results."
+    },
+    "footer": {
+        "tagline": "Short programs, passionate coaches, and tailored guidance to accelerate your skills.",
+        "navigation_title": "Navigation",
+        "contact_title": "Contact",
+        "contact_text": "Need a training plan? Let's talk.",
+        "contact_cta": "Book a call",
+        "badges": {
+            "pro": "Pro",
+            "mentoring": "Mentoring",
+            "education": "Education"
+        },
+        "copyright": "© %year% MeetYourCoach. All rights reserved."
+    },
+    "trainer": {
+        "title": "Trainer space",
+        "forms": {
+            "course": {
+                "create": "Create a course",
+                "edit": "Edit course",
+                "fields": {
+                    "title": "Title",
+                    "description": "Description",
+                    "price": "Price",
+                    "level": "Level",
+                    "image": "Image"
+                },
+                "levels": {
+                    "debutant": "Beginner",
+                    "intermediaire": "Intermediate",
+                    "avance": "Advanced"
+                }
+            },
+            "workshop": {
+                "create": "Create a workshop",
+                "edit": "Edit workshop",
+                "fields": {
+                    "title": "Title",
+                    "description": "Description",
+                    "price": "Price",
+                    "date": "Date",
+                    "duration": "Duration (min)",
+                    "capacity": "Seats",
+                    "location": "Location",
+                    "image": "Image"
+                }
+            },
+            "shared": {
+                "current_image": "Current image: %link%"
+            },
+            "actions": {
+                "submit": "Submit",
+                "update": "Update",
+                "cancel": "Cancel"
+            }
+        },
+        "lists": {
+            "courses": "My courses",
+            "workshops": "My workshops",
+            "empty_courses": "No courses yet.",
+            "empty_workshops": "You haven't created any workshops yet.",
+            "edit": "Edit",
+            "delete": "Delete",
+            "confirm_course": "Delete this course?",
+            "confirm_workshop": "Delete this workshop?",
+            "view": "view"
+        }
+    },
+    "contact": {
+        "title": "Book a call",
+        "hero": {
+            "badge": "Let's talk?",
+            "heading": "Let’s plan your discovery session",
+            "text": "Tell us about your goals (upskilling, 1:1 coaching, team workshops). A MeetYourCoach expert gets back to you within 24h with a dedicated slot and action plan.",
+            "points": {
+                "1": "✔ Personalized slot (remote or in-person)",
+                "2": "✔ Needs assessment",
+                "3": "✔ Tailored learning proposal"
+            }
+        },
+        "form": {
+            "badge": "Fast contact",
+            "title": "Share your contact details",
+            "fields": {
+                "name": "Full name *",
+                "email": "Work email *",
+                "goal": "Goal & context *",
+                "slot": "Preferred slot",
+                "slot_placeholder": "Choose…",
+                "slot_morning": "Morning (9am-12pm)",
+                "slot_afternoon": "Afternoon (2pm-5pm)",
+                "slot_evening": "Evening (6pm-8pm)"
+            },
+            "placeholders": {
+                "name": "Alex Martin",
+                "email": "you@company.com",
+                "goal": "e.g. leadership coaching for my product team"
+            },
+            "submit": "Send my request",
+            "disclaimer": "By submitting this form, you agree to be contacted by the MeetYourCoach team."
+        },
+        "cards": {
+            "visio_badge": "Remote",
+            "visio_title": "Strategy session (30 min)",
+            "visio_text": "Explore your challenges, recommended path, and budget estimate.",
+            "mentoring_badge": "Mentoring",
+            "mentoring_title": "Coach matching",
+            "mentoring_text": "We pick the right trainer for your industry and goals.",
+            "follow_badge": "Follow-up",
+            "follow_title": "Action plan",
+            "follow_text": "Receive a personalized roadmap and next steps."
+        }
+    },
+    "profile": {
+        "title": "My profile",
+        "avatar_alt": "Avatar",
+        "no_bio": "No bio yet.",
+        "logout": "Log out",
+        "public_section": "My public profile",
+        "fields": {
+            "first_name": "First name",
+            "last_name": "Last name",
+            "bio": "Biography",
+            "photo": "Profile picture"
+        },
+        "photo_hint": "Leave blank to keep the current photo.",
+        "save": "Save profile"
+    },
+    "learner": {
+        "reviews": {
+            "badge": "Reviews",
+            "title": "My reviews",
+            "empty": "You have not left any reviews yet."
+        }
+    }
+}

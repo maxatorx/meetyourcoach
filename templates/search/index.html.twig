@@ -1,0 +1,61 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}{{ trans('search.title') }} · MeetYourCoach{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-4">{{ trans('search.title') }}</h1>
+{% set decimal_sep = current_locale == 'en' ? '.' : ',' %}
+{% set thousand_sep = current_locale == 'en' ? ',' : ' ' %}
+<form class="row g-3 mb-4" method="get" action="{{ path('recherche') }}">
+    <div class="col-md-4">
+        <label class="form-label">{{ trans('search.fields.title') }}</label>
+        <input type="text" class="form-control" name="titre" value="{{ filters.titre }}">
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">{{ trans('search.fields.type') }}</label>
+        <select class="form-select" name="type">
+            <option value="">{{ trans('search.options.all') }}</option>
+            <option value="cours" {{ filters.type == 'cours' ? 'selected' : '' }}>{{ trans('search.options.course') }}</option>
+            <option value="atelier" {{ filters.type == 'atelier' ? 'selected' : '' }}>{{ trans('search.options.workshop') }}</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">{{ trans('search.fields.level') }}</label>
+        <select class="form-select" name="niveau">
+            <option value="">{{ trans('search.options.all') }}</option>
+            <option value="debutant" {{ filters.niveau == 'debutant' ? 'selected' : '' }}>{{ trans('search.options.levels.debutant') }}</option>
+            <option value="intermediaire" {{ filters.niveau == 'intermediaire' ? 'selected' : '' }}>{{ trans('search.options.levels.intermediaire') }}</option>
+            <option value="avance" {{ filters.niveau == 'avance' ? 'selected' : '' }}>{{ trans('search.options.levels.avance') }}</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <label class="form-label">{{ trans('search.fields.date') }}</label>
+        <input type="date" class="form-control" name="date" value="{{ filters.date }}">
+    </div>
+    <div class="col-12">
+        <button class="btn btn-primary" type="submit">{{ trans('search.filter_button') }}</button>
+    </div>
+</form>
+<div class="row g-3">
+    {% for item in results %}
+        <div class="col-md-4">
+            <div class="card h-100">
+                {% if item.imageUrl %}
+                    {% set card_image = asset(item.imageUrl) %}
+                    <img src="{{ card_image }}" class="card-img-top" alt="{{ item.title }}">
+                {% endif %}
+                <div class="card-body">
+                    <span class="badge bg-info text-dark">{{ item.type == 'cours' ? trans('search.card.type_course') : trans('search.card.type_workshop') }}</span>
+                    <h2 class="h5 mt-2">{{ item.title }}</h2>
+                    <p class="text-muted">{{ item.trainer }}</p>
+                    {% set formatted_price = item.price|number_format(2, decimal_sep, thousand_sep) %}
+                    <p class="fw-semibold">{{ trans('search.card.price', {'price': formatted_price}) }}</p>
+                    <a href="{{ path(item.type ~ '/' ~ item.id) }}" class="btn btn-outline-primary btn-sm">{{ trans('search.card.view') }}</a>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <p>{{ trans('search.empty') }}</p>
+    {% endfor %}
+</div>
+{% endblock %}

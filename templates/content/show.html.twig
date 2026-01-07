@@ -1,0 +1,194 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}{{ (type == 'cours' ? 'Cours' : 'Atelier')|autotrans }} · MeetYourCoach{% endblock %}
+
+{% block content %}
+{% if not content %}
+    <p>Contenu introuvable.</p>
+{% else %}
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card mb-3">
+            {% if content.imageUrl %}
+                <img src="{{ asset(content.imageUrl) }}" class="card-img-top" alt="{{ content.title }}">
+            {% endif %}
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <span class="badge bg-secondary mb-2">{{ (type == 'cours' ? 'Cours' : 'Atelier')|autotrans }}</span>
+                        <h1 class="h3">{{ content.title|autotrans }}</h1>
+                        {% if type == 'cours' %}
+                            <p class="text-muted mb-0">{{ ('Niveau : ' ~ content.level)|autotrans }}</p>
+                        {% else %}
+                            <p class="text-muted mb-0">{{ ('Date : ' ~ content.scheduledAt|date('d/m/Y H:i') ~ ' · ' ~ content.location)|autotrans }}</p>
+                            <p class="text-muted">{{ ('Places restantes : ' ~ (content.nbPlaces - content.nbInscrits))|autotrans }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="text-end">
+                        <p class="h4">{{ content.price|number_format(2, ',', ' ') }} €</p>
+                        {% set status_class = 'bg-secondary' %}
+                        {% if type == 'cours' %}
+                            {% if content.status == 'publie' %}
+                                {% set status_class = 'bg-success' %}
+                            {% elseif content.status == 'brouillon' %}
+                                {% set status_class = 'bg-warning text-dark' %}
+                            {% endif %}
+                        {% else %}
+                            {% if content.status == 'valide' %}
+                                {% set status_class = 'bg-success' %}
+                            {% elseif content.status == 'en_attente' %}
+                                {% set status_class = 'bg-warning text-dark' %}
+                            {% elseif content.status == 'annule' %}
+                                {% set status_class = 'bg-secondary' %}
+                            {% endif %}
+                        {% endif %}
+                        <span class="badge {{ status_class }}">{{ content.status|replace({'_': ' '})|capitalize }}</span>
+                    </div>
+                </div>
+                {% set paragraphs = content.description|split('\n') %}
+                <div class="mt-3 d-grid gap-2">
+                    {% set has_paragraph = false %}
+                    {% set in_list = false %}
+                    {% for paragraph in paragraphs %}
+                        {% set trimmed = paragraph|trim %}
+                        {% if trimmed starts with '-' or trimmed starts with '*' or trimmed starts with '✔' %}
+                            {% if not in_list %}
+                                {% set in_list = true %}
+                                <ul class="list-unstyled mb-0 d-grid gap-1">
+                            {% endif %}
+                            {% set has_paragraph = true %}
+                            {% if trimmed starts with '✔' %}
+                                <li>✔ {{ trimmed|slice(1)|trim|autotrans }}</li>
+                            {% else %}
+                                <li>{{ trimmed|slice(1)|trim|autotrans }}</li>
+                            {% endif %}
+                        {% else %}
+                            {% if in_list %}
+                                </ul>
+                                {% set in_list = false %}
+                            {% endif %}
+                            {% if trimmed != '' %}
+                                {% set has_paragraph = true %}
+                                <p class="mb-0">{{ trimmed|autotrans }}</p>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                    {% if in_list %}
+                        </ul>
+                    {% endif %}
+                    {% if not has_paragraph %}
+                        <p class="mb-0">{{ content.description|autotrans }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% if trainer %}
+            <div class="card mb-4">
+                <div class="card-body d-flex align-items-center gap-3">
+                    {% set trainerPhoto = trainer.photo ? asset(trainer.photo) : 'https://via.placeholder.com/80x80?text=Coach' %}
+                    <img src="{{ trainerPhoto }}" alt="Photo formateur" class="rounded-circle" width="80" height="80">
+                    <div>
+                        <a class="text-decoration-none" href="{{ path('formateur/' ~ trainer.id) }}">
+                            <h2 class="h5 mb-1">{{ trainer.firstName }} {{ trainer.lastName }}</h2>
+                        </a>
+                        {% set trainer_bio = trainer.bio ?: 'Formateur indépendant.' %}
+                        {% set trainer_bio_lines = trainer_bio|split('\\n') %}
+                        <div class="text-muted d-grid gap-1">
+                            {% for line in trainer_bio_lines %}
+                                {% set trimmed = line|trim %}
+                                {% if trimmed != '' %}
+                                    <p class="mb-0">{{ trimmed|autotrans }}</p>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <section class="mb-4">
+            <h2 class="h5">{{ 'Avis'|autotrans }}</h2>
+            {% if is_logged_in and is_registered %}
+                <form method="post" action="{{ path(type ~ '/' ~ content.id) }}" class="card card-body mb-3">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <input type="hidden" name="action" value="review">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">{{ 'Note'|autotrans }}</label>
+                            <select name="rating" class="form-select">
+                                {% for n in 1..5 %}
+                                    <option value="{{ n }}">
+                                        {% for i in 1..5 %}
+                                            {{ i <= n ? '★' : '☆' }}
+                                        {% endfor %}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-9">
+                            <label class="form-label">{{ 'Commentaire'|autotrans }}</label>
+                            <textarea name="comment" class="form-control" rows="2" required></textarea>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary mt-3" type="submit">{{ 'Publier mon avis'|autotrans }}</button>
+                </form>
+            {% elseif not is_logged_in %}
+                <p>{{ 'Connectez-vous pour laisser un avis.'|autotrans }}</p>
+            {% endif %}
+
+            {% for review in reviews %}
+                <div class="border rounded p-3 mb-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <strong>
+                            {% for i in 1..5 %}
+                                {{ i <= review.rating ? '★' : '☆' }}
+                            {% endfor %}
+                        </strong>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="text-muted small">{{ review.createdAt|date('d/m/Y') }}</span>
+                            {% if is_logged_in and current_user.id == review.userId %}
+                                <form method="post" action="{{ path(type ~ '/' ~ content.id) }}" onsubmit="return confirm('{{ 'Supprimer cet avis ?'|autotrans }}');">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                    <input type="hidden" name="action" value="delete_review">
+                                    <input type="hidden" name="review_id" value="{{ review.id }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">{{ 'Supprimer'|autotrans }}</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <p class="mb-1">{{ review.comment|autotrans }}</p>
+                    {% if review.authorName %}
+                        <p class="text-muted small mb-0">{{ ('par ' ~ review.authorName)|autotrans }}</p>
+                    {% endif %}
+                </div>
+            {% else %}
+                <p>{{ 'Aucun avis pour l\'instant.'|autotrans }}</p>
+            {% endfor %}
+        </section>
+    </div>
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-body">
+                {% if is_logged_in %}
+                    {% if is_registered %}
+                        <form method="post" action="{{ path(type ~ '/' ~ content.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                            <input type="hidden" name="action" value="unregister">
+                            <button class="btn btn-outline-danger w-100" type="submit">{{ 'Se désinscrire'|autotrans }}</button>
+                        </form>
+                    {% else %}
+                        <form method="post" action="{{ path(type ~ '/' ~ content.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                            <input type="hidden" name="action" value="register">
+                            <button class="btn btn-primary w-100" type="submit">{{ 'S\'inscrire'|autotrans }}</button>
+                        </form>
+                    {% endif %}
+                {% else %}
+                    <a class="btn btn-outline-primary w-100" href="{{ path('login') }}">{{ 'Connectez-vous pour vous inscrire'|autotrans }}</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

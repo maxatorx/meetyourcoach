@@ -1,0 +1,48 @@
+<div class="card mb-3">
+    <div class="card-body">
+        {% set is_edit = course is defined and course %}
+        <h2 class="h5 mb-3">{{ is_edit ? trans('trainer.forms.course.edit') : trans('trainer.forms.course.create') }}</h2>
+        <input type="hidden" name="form_type" value="course">
+        {% if is_edit %}
+            <input type="hidden" name="course_id" value="{{ course.id }}">
+        {% endif %}
+        <div class="mb-3">
+            <label class="form-label">{{ trans('trainer.forms.course.fields.title') }}</label>
+            <input type="text" name="titre" class="form-control" value="{{ is_edit ? course.title : '' }}" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">{{ trans('trainer.forms.course.fields.description') }}</label>
+            <textarea name="description" class="form-control" rows="3" required>{{ is_edit ? course.description : '' }}</textarea>
+        </div>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">{{ trans('trainer.forms.course.fields.price') }}</label>
+                <input type="number" step="0.01" name="prix" class="form-control" value="{{ is_edit ? course.price : '' }}" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">{{ trans('trainer.forms.course.fields.level') }}</label>
+                <select name="niveau" class="form-select">
+                    <option value="debutant" {{ is_edit and course.level == 'debutant' ? 'selected' : '' }}>{{ trans('trainer.forms.course.levels.debutant') }}</option>
+                    <option value="intermediaire" {{ is_edit and course.level == 'intermediaire' ? 'selected' : '' }}>{{ trans('trainer.forms.course.levels.intermediaire') }}</option>
+                    <option value="avance" {{ is_edit and course.level == 'avance' ? 'selected' : '' }}>{{ trans('trainer.forms.course.levels.avance') }}</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">{{ trans('trainer.forms.course.fields.image') }}</label>
+                <input type="file" name="image" class="form-control" accept="image/*" lang="{{ current_locale }}">
+                {% if is_edit and course.imageUrl %}
+                    {% set image_link %}
+                        <a href="{{ asset(course.imageUrl) }}" target="_blank">{{ trans('trainer.lists.view') }}</a>
+                    {% endset %}
+                        <small class="text-muted d-block mt-1">{{ trans('trainer.forms.shared.current_image', {'link': image_link|trim})|raw }}</small>
+                {% endif %}
+            </div>
+        </div>
+        <div class="d-flex gap-2 mt-3">
+            <button class="btn btn-primary" type="submit">{{ is_edit ? trans('trainer.forms.actions.update') : trans('trainer.forms.actions.submit') }}</button>
+            {% if is_edit %}
+                <a class="btn btn-outline-secondary" href="{{ path('formateur') }}">{{ trans('trainer.forms.actions.cancel') }}</a>
+            {% endif %}
+        </div>
+    </div>
+</div>

@@ -1,0 +1,83 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}{{ trans('contact.title') }} · MeetYourCoach{% endblock %}
+
+{% block content %}
+<section class="myc-hero mb-4">
+    <div class="row align-items-center gy-4">
+        <div class="col-lg-7">
+            <p class="badge badge-rounded badge-cours text-uppercase mb-3">{{ trans('contact.hero.badge') }}</p>
+            <h1 class="display-6 mb-3">{{ trans('contact.hero.heading') }}</h1>
+            <p class="mb-4">{{ trans('contact.hero.text') }}</p>
+            <ul class="list-unstyled mb-0 text-muted">
+                <li class="mb-2">{{ trans('contact.hero.points.1') }}</li>
+                <li class="mb-2">{{ trans('contact.hero.points.2') }}</li>
+                <li>{{ trans('contact.hero.points.3') }}</li>
+            </ul>
+        </div>
+        <div class="col-lg-5">
+            <div class="card myc-card">
+                <div class="card-body">
+                    <p class="text-uppercase small text-muted mb-2">{{ trans('contact.form.badge') }}</p>
+                    <h2 class="h5 mb-3">{{ trans('contact.form.title') }}</h2>
+                    <form method="post" action="{{ path('contact') }}" class="d-grid gap-3">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <div>
+                            <label class="form-label">{{ trans('contact.form.fields.name') }}</label>
+                            <input type="text" name="full_name" class="form-control" placeholder="{{ trans('contact.form.placeholders.name') }}" required>
+                        </div>
+                        <div>
+                            <label class="form-label">{{ trans('contact.form.fields.email') }}</label>
+                            <input type="email" name="email" class="form-control" placeholder="{{ trans('contact.form.placeholders.email') }}" required>
+                        </div>
+                        <div>
+                            <label class="form-label">{{ trans('contact.form.fields.goal') }}</label>
+                            <textarea name="goal" class="form-control" rows="4" placeholder="{{ trans('contact.form.placeholders.goal') }}" required></textarea>
+                        </div>
+                        <div>
+                            <label class="form-label">{{ trans('contact.form.fields.slot') }}</label>
+                            <select name="slot" class="form-select">
+                                <option value="">{{ trans('contact.form.fields.slot_placeholder') }}</option>
+                                <option>{{ trans('contact.form.fields.slot_morning') }}</option>
+                                <option>{{ trans('contact.form.fields.slot_afternoon') }}</option>
+                                <option>{{ trans('contact.form.fields.slot_evening') }}</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary w-100" type="submit">{{ trans('contact.form.submit') }}</button>
+                        <p class="small text-muted mb-0">{{ trans('contact.form.disclaimer') }}</p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="row g-4">
+    <div class="col-md-4">
+        <div class="card myc-card h-100">
+            <div class="card-body">
+                <p class="badge badge-rounded badge-cours mb-2">{{ trans('contact.cards.visio_badge') }}</p>
+                <h3 class="h6">{{ trans('contact.cards.visio_title') }}</h3>
+                <p class="text-muted mb-0">{{ trans('contact.cards.visio_text') }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card myc-card h-100">
+            <div class="card-body">
+                <p class="badge badge-rounded badge-atelier mb-2">{{ trans('contact.cards.mentoring_badge') }}</p>
+                <h3 class="h6">{{ trans('contact.cards.mentoring_title') }}</h3>
+                <p class="text-muted mb-0">{{ trans('contact.cards.mentoring_text') }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card myc-card h-100">
+            <div class="card-body">
+                <p class="badge badge-rounded text-bg-light text-muted mb-2">{{ trans('contact.cards.follow_badge') }}</p>
+                <h3 class="h6">{{ trans('contact.cards.follow_title') }}</h3>
+                <p class="text-muted mb-0">{{ trans('contact.cards.follow_text') }}</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

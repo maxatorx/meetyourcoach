@@ -1,0 +1,212 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Administration · MeetYourCoach{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-4">Administration</h1>
+<div class="mb-4">
+    <h2 class="h5">Utilisateurs</h2>
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Email</th>
+                    <th>Rôle</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td>{{ user.firstName }} {{ user.lastName }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.role }}</td>
+                        <td>
+                            <form method="post" action="{{ path('admin') }}" class="d-flex gap-2 align-items-center">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                <input type="hidden" name="action" value="update_role">
+                                <input type="hidden" name="user_id" value="{{ user.id }}">
+                                <select name="role" class="form-select form-select-sm">
+                                    <option value="apprenant" {{ user.role == 'apprenant' ? 'selected' : '' }}>Apprenant</option>
+                                    <option value="formateur" {{ user.role == 'formateur' ? 'selected' : '' }}>Formateur</option>
+                                    <option value="admin" {{ user.role == 'admin' ? 'selected' : '' }}>Admin</option>
+                                </select>
+                                <button class="btn btn-sm btn-outline-primary" type="submit">Mettre à jour</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="4">Aucun utilisateur.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="mb-4">
+    <h2 class="h5">Cours</h2>
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Titre</th>
+                    <th>Niveau</th>
+                    <th>Statut</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for course in courses %}
+                    <tr>
+                        <td>{{ course.title }}</td>
+                        <td>{{ course.level }}</td>
+                        <td><span class="badge bg-secondary">{{ course.status }}</span></td>
+                        <td>
+                            <form method="post" action="{{ path('admin') }}" class="d-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                <input type="hidden" name="action" value="validate_course">
+                                <input type="hidden" name="course_id" value="{{ course.id }}">
+                                <select name="status" class="form-select form-select-sm d-inline-block w-auto">
+                                    <option value="brouillon">Brouillon</option>
+                                    <option value="publie" {{ course.status == 'publie' ? 'selected' : '' }}>Publié</option>
+                                    <option value="archive" {{ course.status == 'archive' ? 'selected' : '' }}>Archivé</option>
+                                </select>
+                                <button class="btn btn-sm btn-outline-success" type="submit">Valider</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">
+                            <div class="d-flex flex-wrap gap-3 align-items-start">
+                                <form method="post" action="{{ path('admin') }}" class="row g-2 align-items-end flex-grow-1">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                    <input type="hidden" name="action" value="update_course">
+                                    <input type="hidden" name="course_id" value="{{ course.id }}">
+                                    <div class="col-12 col-md-4">
+                                        <label class="form-label small">Titre</label>
+                                        <input class="form-control form-control-sm" name="titre" value="{{ course.title }}">
+                                    </div>
+                                    <div class="col-6 col-md-2">
+                                        <label class="form-label small">Prix</label>
+                                        <input class="form-control form-control-sm" name="prix" type="number" step="0.01" value="{{ course.price }}">
+                                    </div>
+                                    <div class="col-6 col-md-2">
+                                        <label class="form-label small">Niveau</label>
+                                        <select name="niveau" class="form-select form-select-sm">
+                                            <option value="debutant" {{ course.level == 'debutant' ? 'selected' : '' }}>Débutant</option>
+                                            <option value="intermediaire" {{ course.level == 'intermediaire' ? 'selected' : '' }}>Intermédiaire</option>
+                                            <option value="avance" {{ course.level == 'avance' ? 'selected' : '' }}>Avancé</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <label class="form-label small">Description</label>
+                                        <input class="form-control form-control-sm" name="description" value="{{ course.description }}">
+                                    </div>
+                                    <div class="col-12 col-md-2">
+                                        <button class="btn btn-sm btn-outline-primary w-100" type="submit">Enregistrer</button>
+                                    </div>
+                                </form>
+                                <form method="post" action="{{ path('admin') }}" onsubmit="return confirm('Supprimer ce cours ?');">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                    <input type="hidden" name="action" value="delete_course">
+                                    <input type="hidden" name="course_id" value="{{ course.id }}">
+                                    <button class="btn btn-sm btn-outline-danger" type="submit">Supprimer</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="4">Aucun cours.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<div>
+    <h2 class="h5">Ateliers</h2>
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Titre</th>
+                    <th>Date</th>
+                    <th>Statut</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for workshop in workshops %}
+                    <tr>
+                        <td>{{ workshop.title }}</td>
+                        <td>{{ workshop.scheduledAt|date('d/m/Y H:i') }}</td>
+                        <td><span class="badge bg-info text-dark">{{ workshop.status }}</span></td>
+                        <td>
+                            <form method="post" action="{{ path('admin') }}" class="d-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                <input type="hidden" name="action" value="validate_workshop">
+                                <input type="hidden" name="workshop_id" value="{{ workshop.id }}">
+                                <select name="status" class="form-select form-select-sm d-inline-block w-auto">
+                                    <option value="en_attente">En attente</option>
+                                    <option value="valide" {{ workshop.status == 'valide' ? 'selected' : '' }}>Validé</option>
+                                    <option value="annule" {{ workshop.status == 'annule' ? 'selected' : '' }}>Annulé</option>
+                                </select>
+                                <button class="btn btn-sm btn-outline-success" type="submit">Mettre à jour</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">
+                            <div class="d-flex flex-wrap gap-3 align-items-start">
+                                <form method="post" action="{{ path('admin') }}" class="row g-2 align-items-end flex-grow-1">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                    <input type="hidden" name="action" value="update_workshop">
+                                    <input type="hidden" name="workshop_id" value="{{ workshop.id }}">
+                                    <div class="col-12 col-md-3">
+                                        <label class="form-label small">Titre</label>
+                                        <input class="form-control form-control-sm" name="titre" value="{{ workshop.title }}">
+                                    </div>
+                                    <div class="col-6 col-md-2">
+                                        <label class="form-label small">Prix</label>
+                                        <input class="form-control form-control-sm" name="prix" type="number" step="0.01" value="{{ workshop.price }}">
+                                    </div>
+                                    <div class="col-6 col-md-3">
+                                        <label class="form-label small">Date</label>
+                                        <input class="form-control form-control-sm" type="datetime-local" name="date" value="{{ workshop.scheduledAt|date('Y-m-d\\TH:i') }}">
+                                    </div>
+                                    <div class="col-6 col-md-2">
+                                        <label class="form-label small">Durée (min)</label>
+                                        <input class="form-control form-control-sm" name="duree" type="number" value="{{ workshop.durationMinutes }}">
+                                    </div>
+                                    <div class="col-6 col-md-2">
+                                        <label class="form-label small">Places</label>
+                                        <input class="form-control form-control-sm" name="places" type="number" value="{{ workshop.nbPlaces }}">
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <label class="form-label small">Lieu</label>
+                                        <input class="form-control form-control-sm" name="lieu" value="{{ workshop.location }}">
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label small">Description</label>
+                                        <input class="form-control form-control-sm" name="description" value="{{ workshop.description }}">
+                                    </div>
+                                    <div class="col-12 col-md-2">
+                                        <button class="btn btn-sm btn-outline-primary w-100" type="submit">Enregistrer</button>
+                                    </div>
+                                </form>
+                                <form method="post" action="{{ path('admin') }}" onsubmit="return confirm('Supprimer cet atelier ?');">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                    <input type="hidden" name="action" value="delete_workshop">
+                                    <input type="hidden" name="workshop_id" value="{{ workshop.id }}">
+                                    <button class="btn btn-sm btn-outline-danger" type="submit">Supprimer</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="4">Aucun atelier.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

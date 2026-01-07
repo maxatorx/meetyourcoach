@@ -1,0 +1,70 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}{{ trans('profile.title') }} · MeetYourCoach{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-4">{{ trans('profile.title') }}</h1>
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                {% if current_user.photo %}
+                    {% set avatar = asset(current_user.photo) %}
+                {% else %}
+                    {% set avatar = 'https://via.placeholder.com/120x120?text=ME' %}
+                {% endif %}
+                <img src="{{ avatar }}" alt="{{ trans('profile.avatar_alt') }}" class="rounded-circle mb-3" width="120" height="120">
+                <h2 class="h5">{{ current_user.first_name }} {{ current_user.last_name }}</h2>
+                <p class="text-muted">{{ current_user.email }}</p>
+                {% set bio_text = current_user.bio ?: trans('profile.no_bio') %}
+                {% set bio_lines = bio_text|split('\n') %}
+                <div class="d-grid gap-2">
+                    {% for line in bio_lines %}
+                        {% set trimmed = line|trim %}
+                        {% if trimmed != '' %}
+                            <p class="mb-0">{{ trimmed|autotrans }}</p>
+                        {% endif %}
+                    {% endfor %}
+                    {% if bio_text|trim == '' %}
+                        <p class="mb-0">{{ trans('profile.no_bio')|autotrans }}</p>
+                    {% endif %}
+                </div>
+                <form method="post" action="{{ path('logout') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_logout }}">
+                    <button class="btn btn-outline-danger" type="submit">{{ trans('profile.logout') }}</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="h5 mb-3">{{ trans('profile.public_section') }}</h2>
+                <form method="post" action="{{ path('profil') }}" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">{{ trans('profile.fields.first_name') }}</label>
+                            <input type="text" name="prenom" class="form-control" value="{{ current_user.first_name }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ trans('profile.fields.last_name') }}</label>
+                            <input type="text" name="nom" class="form-control" value="{{ current_user.last_name }}" required>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <label class="form-label">{{ trans('profile.fields.bio') }}</label>
+                        <textarea class="form-control" name="bio" rows="4">{{ current_user.bio }}</textarea>
+                    </div>
+                    <div class="mt-3">
+                        <label class="form-label">{{ trans('profile.fields.photo') }}</label>
+                        <input type="file" name="photo" class="form-control" accept="image/*" lang="{{ current_locale }}">
+                        <small class="text-muted">{{ trans('profile.photo_hint') }}</small>
+                    </div>
+                    <button class="btn btn-primary mt-4" type="submit">{{ trans('profile.save') }}</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

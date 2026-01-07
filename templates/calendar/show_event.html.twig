@@ -1,0 +1,24 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}{{ trans('calendar.form.title') }} · MeetYourCoach{% endblock %}
+
+{% block content %}
+{% if not event %}
+    <div class="alert alert-danger">{{ trans('calendar.event.not_found') }}</div>
+{% else %}
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <p class="text-uppercase small text-muted mb-1">{{ trans('calendar.modal.personal.badge') }}</p>
+            <h1 class="h4">{{ event.title }}</h1>
+            <p class="text-muted mb-3">{{ event.scheduledAt|date('d/m/Y H\\hi') }}</p>
+            {% if event.location %}
+                <p class="mb-1"><strong>Lieu :</strong> {{ event.location }}</p>
+            {% endif %}
+            {% if event.description %}
+                <p class="mb-3">{{ event.description }}</p>
+            {% endif %}
+            <a class="btn btn-primary" href="{{ path('calendrier', {'month': event.scheduledAt|date('n'), 'year': event.scheduledAt|date('Y')}) }}">{{ trans('calendar.event.back') }}</a>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

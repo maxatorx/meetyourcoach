@@ -1,0 +1,38 @@
+<footer class="myc-footer mt-5">
+    <div class="container py-5">
+        <div class="row gy-4">
+            <div class="col-md-4">
+                <div class="d-flex align-items-center mb-3">
+                    <img src="{{ asset('assets/images/meetyourcoach.png') }}" alt="MeetYourCoach" class="me-2" height="36">
+                    <div>
+                        <p class="mb-0 fw-semibold">MeetYourCoach</p>
+                        <small class="text-muted">Coaching & Mentorat</small>
+                    </div>
+                </div>
+                <p class="mb-3">{{ trans('footer.tagline') }}</p>
+                <div class="d-flex gap-2">
+                    <span class="badge badge-rounded badge-cours">{{ trans('footer.badges.pro') }}</span>
+                    <span class="badge badge-rounded badge-atelier">{{ trans('footer.badges.mentoring') }}</span>
+                    <span class="badge badge-rounded text-bg-light text-muted">{{ trans('footer.badges.education') }}</span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <h3 class="h6 text-uppercase text-muted">{{ trans('footer.navigation_title') }}</h3>
+                <ul class="list-unstyled mb-0">
+                    <li><a class="myc-footer-link" href="{{ path('/') }}">{{ trans('navigation.home') }}</a></li>
+                    <li><a class="myc-footer-link" href="{{ path('recherche') }}">{{ trans('navigation.catalog') }}</a></li>
+                    <li><a class="myc-footer-link" href="{{ path('login') }}">{{ trans('navigation.login') }}</a></li>
+                    <li><a class="myc-footer-link" href="{{ path('register') }}">{{ trans('navigation.register') }}</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h3 class="h6 text-uppercase text-muted">{{ trans('footer.contact_title') }}</h3>
+                <p class="mb-2">{{ trans('footer.contact_text') }}</p>
+                <a class="btn btn-outline-primary btn-sm" href="{{ path('contact') }}">{{ trans('footer.contact_cta') }}</a>
+            </div>
+        </div>
+        <div class="text-center mt-4 pt-3 border-top">
+            <small class="text-muted">{{ trans('footer.copyright', {'year': 'now'|date('Y')}) }}</small>
+        </div>
+    </div>
+</footer>

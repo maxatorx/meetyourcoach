@@ -1,0 +1,58 @@
+<div class="card">
+    <div class="card-body">
+        {% set is_edit = workshop is defined and workshop %}
+        <h2 class="h5 mb-3">{{ is_edit ? trans('trainer.forms.workshop.edit') : trans('trainer.forms.workshop.create') }}</h2>
+        <input type="hidden" name="form_type" value="workshop">
+        {% if is_edit %}
+            <input type="hidden" name="workshop_id" value="{{ workshop.id }}">
+        {% endif %}
+        <div class="mb-3">
+            <label class="form-label">{{ trans('trainer.forms.workshop.fields.title') }}</label>
+            <input type="text" name="titre" class="form-control" value="{{ is_edit ? workshop.title : '' }}" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">{{ trans('trainer.forms.workshop.fields.description') }}</label>
+            <textarea name="description" class="form-control" rows="3" required>{{ is_edit ? workshop.description : '' }}</textarea>
+        </div>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">{{ trans('trainer.forms.workshop.fields.price') }}</label>
+                <input type="number" step="0.01" name="prix" class="form-control" value="{{ is_edit ? workshop.price : '' }}" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">{{ trans('trainer.forms.workshop.fields.date') }}</label>
+                <input type="datetime-local" name="date" class="form-control" value="{{ is_edit and workshop.scheduledAt ? workshop.scheduledAt|date('Y-m-d\\TH:i') : '' }}" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">{{ trans('trainer.forms.workshop.fields.duration') }}</label>
+                <input type="number" name="duree" class="form-control" min="30" value="{{ is_edit ? workshop.durationMinutes : 60 }}" required>
+            </div>
+        </div>
+        <div class="row g-3 mt-1">
+            <div class="col-md-4">
+                <label class="form-label">{{ trans('trainer.forms.workshop.fields.capacity') }}</label>
+                <input type="number" name="places" class="form-control" min="1" value="{{ is_edit ? workshop.nbPlaces : 10 }}" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">{{ trans('trainer.forms.workshop.fields.location') }}</label>
+                <input type="text" name="lieu" class="form-control" value="{{ is_edit ? workshop.location : '' }}" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">{{ trans('trainer.forms.workshop.fields.image') }}</label>
+                <input type="file" name="image" class="form-control" accept="image/*" lang="{{ current_locale }}">
+                {% if is_edit and workshop.imageUrl %}
+                    {% set image_link %}
+                        <a href="{{ asset(workshop.imageUrl) }}" target="_blank">{{ trans('trainer.lists.view') }}</a>
+                    {% endset %}
+                    <small class="text-muted d-block mt-1">{{ trans('trainer.forms.shared.current_image', {'link': image_link|trim})|raw }}</small>
+                {% endif %}
+            </div>
+        </div>
+        <div class="d-flex gap-2 mt-3">
+            <button class="btn btn-primary" type="submit">{{ is_edit ? trans('trainer.forms.actions.update') : trans('trainer.forms.actions.submit') }}</button>
+            {% if is_edit %}
+                <a class="btn btn-outline-secondary" href="{{ path('formateur') }}">{{ trans('trainer.forms.actions.cancel') }}</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
