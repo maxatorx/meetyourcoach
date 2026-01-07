@@ -96,6 +96,9 @@ final class AuthController extends AbstractController
             return;
         }
 
+        // On mémorise la page précédente pour y revenir après connexion.
+        $this->storeReturnPath();
+
         $this->render('auth/login.html.twig', [
             'csrf_token' => $this->csrfTokenManager->getToken('login'),
         ]);
@@ -141,7 +144,7 @@ final class AuthController extends AbstractController
         }
 
         $this->flashBag->add('success', 'Connexion réussie.');
-        $this->redirect('/');
+        $this->redirect($this->getReturnPath());
     }
 
     public function logout(): void
@@ -158,7 +161,59 @@ final class AuthController extends AbstractController
         setcookie('myc_remember', '', time() - 3600, '/');
         $this->flashBag->add('success', 'Vous êtes déconnecté.');
 
-        $this->redirect('/');
+        $this->redirect('/index.php');
+    }
+
+    private function getReturnPath(): string
+    {
+        // Retourne a la page precedente si possible, sinon accueil.
+        $default = '/index.php';
+        $stored = $_SESSION['login_redirect'] ?? null;
+        if (!is_string($stored) || $stored === '') {
+            return $default;
+        }
+
+        unset($_SESSION['login_redirect']);
+        return $stored;
+    }
+
+    private function storeReturnPath(): void
+    {
+        $referer = $_SERVER['HTTP_REFERER'] ?? '';
+        if ($referer === '') {
+            return;
+        }
+
+        $parts = parse_url($referer);
+        if (!is_array($parts)) {
+            return;
+        }
+
+        $host = $parts['host'] ?? '';
+        $currentHost = $_SERVER['HTTP_HOST'] ?? '';
+        if ($host !== '' && $currentHost !== '' && $host !== $currentHost) {
+            return;
+        }
+
+        $path = $parts['path'] ?? '';
+        if ($path === '' || $path === '/') {
+            return;
+        }
+
+        // Ignore les pages d'auth pour éviter une boucle.
+        if (str_contains($path, '/login') || str_contains($path, '/register')) {
+            return;
+        }
+
+        if ($this->basePath !== '' && str_starts_with($path, $this->basePath)) {
+            $path = substr($path, strlen($this->basePath)) ?: '/';
+        }
+
+        if (!empty($parts['query'])) {
+            $path .= '?' . $parts['query'];
+        }
+
+        $_SESSION['login_redirect'] = $path;
     }
 
     private function handlePhotoUpload(): ?string

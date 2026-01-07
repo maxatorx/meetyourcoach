@@ -36,10 +36,11 @@ final class LearnerController extends AbstractController
 
     public function dashboard(string $httpMethod): void
     {
-        $this->requireRole('apprenant');
+        // Espace accessible a tout utilisateur connecte.
+        $this->requireLogin();
 
         if ($httpMethod === 'POST') {
-            $this->updateProfile();
+            $this->handlePost();
             return;
         }
 
@@ -73,7 +74,7 @@ final class LearnerController extends AbstractController
         ]);
     }
 
-    private function updateProfile(): void
+    private function handlePost(): void
     {
         $token = $_POST['csrf_token'] ?? '';
         if (!$this->csrfTokenManager->validateToken($token, 'learner_profile')) {
@@ -81,6 +82,33 @@ final class LearnerController extends AbstractController
             return;
         }
 
+        $action = $_POST['action'] ?? '';
+        if ($action === 'unregister') {
+            $this->unregister();
+            return;
+        }
+
+        $this->updateProfile();
+    }
+
+    private function unregister(): void
+    {
+        $type = $_POST['type'] ?? '';
+        $contentId = (int) ($_POST['content_id'] ?? 0);
+        if ($contentId <= 0 || ($type !== 'cours' && $type !== 'atelier')) {
+            return;
+        }
+
+        $userId = (int) $this->userSession->getUser()['id'];
+        $this->inscriptionModel->unregister($userId, $type, $contentId);
+        if ($type === 'atelier') {
+            $this->workshopModel->decrementRegistrations($contentId);
+        }
+        $this->flashBag->add('info', 'Inscription annulée.');
+    }
+
+    private function updateProfile(): void
+    {
         $user = $this->userSession->getUser();
         $data = [
             'first_name' => trim($_POST['prenom'] ?? ''),

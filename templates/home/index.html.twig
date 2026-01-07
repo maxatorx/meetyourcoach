@@ -10,7 +10,9 @@
             <h1 class="display-5 mb-3">{{ trans('home.hero.title') }}</h1>
             <p class="mb-4">{{ trans('home.hero.subtitle') }}</p>
             <div class="d-flex flex-wrap gap-2">
-                <a href="{{ path('register') }}" class="btn btn-primary btn-lg px-4">{{ trans('home.hero.cta_primary') }}</a>
+                {% if not is_logged_in %}
+                    <a href="{{ path('register') }}" class="btn btn-primary btn-lg px-4">{{ trans('home.hero.cta_primary') }}</a>
+                {% endif %}
                 <a href="{{ path('recherche') }}" class="btn btn-outline-primary btn-lg px-4">{{ trans('home.hero.cta_secondary') }}</a>
             </div>
         </div>

@@ -273,6 +273,24 @@
         "save": "Sauvegarder le profil"
     },
     "learner": {
+        "dashboard": {
+            "title": "Mon espace",
+            "kicker": "Mon espace",
+            "greeting": "Bonjour {{name}}",
+            "default_name": "coach\u00e9",
+            "courses_title": "Vos cours en cours",
+            "courses_badge": "Cours inscrits",
+            "level_label": "Niveau",
+            "price_label": "Tarif",
+            "continue": "Continuer",
+            "unregister": "Se d\u00e9sinscrire",
+            "empty_courses": "Vous n'\u00eates inscrit \u00e0 aucun cours pour le moment.",
+            "workshops_badge": "Ateliers inscrits",
+            "workshops_title": "Vos ateliers \u00e0 venir",
+            "date_label": "Date",
+            "details": "D\u00e9tails",
+            "empty_workshops": "Aucun atelier planifi\u00e9 pour l'instant."
+        },
         "reviews": {
             "badge": "Avis",
             "title": "Mes avis",

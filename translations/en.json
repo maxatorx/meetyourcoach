@@ -273,6 +273,24 @@
         "save": "Save profile"
     },
     "learner": {
+        "dashboard": {
+            "title": "My dashboard",
+            "kicker": "My dashboard",
+            "greeting": "Hello {{name}}",
+            "default_name": "learner",
+            "courses_title": "Your ongoing courses",
+            "courses_badge": "Registered courses",
+            "level_label": "Level",
+            "price_label": "Price",
+            "continue": "Continue",
+            "unregister": "Unregister",
+            "empty_courses": "You are not enrolled in any courses yet.",
+            "workshops_badge": "Registered workshops",
+            "workshops_title": "Your upcoming workshops",
+            "date_label": "Date",
+            "details": "Details",
+            "empty_workshops": "No workshops scheduled yet."
+        },
         "reviews": {
             "badge": "Reviews",
             "title": "My reviews",

@@ -1,34 +1,24 @@
 {% extends 'layout.html.twig' %}
 
-{% block title %}Mon espace · MeetYourCoach{% endblock %}
+{% block title %}{{ trans('learner.dashboard.title') }} · MeetYourCoach{% endblock %}
 
 {% block content %}
 <section class="myc-dashboard-hero">
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
         <div>
-            <p class="text-uppercase small text-muted mb-1">Mon espace</p>
-            <h1 class="h4 mb-2">Bonjour {{ current_user.first_name ?? 'coaché·e' }}</h1>
-            <p class="mb-0 myc-muted">Gérez votre profil, retrouvez vos cours et ateliers, puis continuez votre progression.</p>
+            <p class="text-uppercase small text-muted mb-1">{{ trans('learner.dashboard.kicker') }}</p>
+            <h1 class="h4 mb-2">{{ trans('learner.dashboard.greeting', {'name': current_user.first_name ?? trans('learner.dashboard.default_name')}) }}</h1>
         </div>
-        <a href="{{ path('/') }}" class="btn btn-outline-primary px-4">Voir le catalogue</a>
     </div>
 </section>
 <div class="row g-4">
-    <div class="col-lg-4">
-        <div class="card myc-card h-100">
-            <div class="card-body">
-                <p class="text-muted mb-0">Retrouvez vos réglages détaillés dans la page Profil.</p>
-                <a class="btn btn-outline-primary w-100 mt-3" href="{{ path('profil') }}">Aller à mon profil</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-8">
+    <div class="col-lg-12">
         <div class="card myc-card myc-enrollment-card mb-4">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div>
-                        <p class="badge badge-rounded badge-cours mb-1">Cours inscrits</p>
-                        <h2 class="h5 mb-0">Vos cours en cours</h2>
+                        <p class="badge badge-rounded badge-cours mb-1">{{ trans('learner.dashboard.courses_badge') }}</p>
+                        <h2 class="h5 mb-0">{{ trans('learner.dashboard.courses_title') }}</h2>
                     </div>
                 </div>
                 {% if enrolled_courses %}
@@ -36,14 +26,23 @@
                         <div class="myc-enrollment-item">
                             <div>
                                 <p class="fw-semibold mb-1">{{ course.title }}</p>
-                                <p class="small text-muted mb-1">Niveau : {{ course.level|replace({'_':' '})|title }}</p>
-                                <p class="small text-muted mb-0">Tarif : {{ course.price|number_format(2, ',', ' ') }} €</p>
+                                <p class="small text-muted mb-1">{{ trans('learner.dashboard.level_label') }} : {{ course.level|replace({'_':' '})|title }}</p>
+                                <p class="small text-muted mb-0">{{ trans('learner.dashboard.price_label') }} : {{ course.price|number_format(2, ',', ' ') }} €</p>
                             </div>
-                            <a class="btn btn-sm btn-outline-primary" href="{{ path('cours/' ~ course.id) }}">Continuer</a>
+                            <div class="d-flex gap-2">
+                                <a class="btn btn-sm btn-outline-primary" href="{{ path('cours/' ~ course.id) }}">{{ trans('learner.dashboard.continue') }}</a>
+                                <form method="post" action="{{ path('espace') }}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                    <input type="hidden" name="action" value="unregister">
+                                    <input type="hidden" name="type" value="cours">
+                                    <input type="hidden" name="content_id" value="{{ course.id }}">
+                                    <button class="btn btn-sm btn-outline-danger" type="submit">{{ trans('learner.dashboard.unregister') }}</button>
+                                </form>
+                            </div>
                         </div>
                     {% endfor %}
                 {% else %}
-                    <p class="text-muted mb-0">Vous n'êtes inscrit à aucun cours pour le moment.</p>
+                    <p class="text-muted mb-0">{{ trans('learner.dashboard.empty_courses') }}</p>
                 {% endif %}
             </div>
         </div>
@@ -51,8 +50,8 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div>
-                        <p class="badge badge-rounded badge-atelier mb-1">Ateliers inscrits</p>
-                        <h2 class="h5 mb-0">Vos ateliers à venir</h2>
+                        <p class="badge badge-rounded badge-atelier mb-1">{{ trans('learner.dashboard.workshops_badge') }}</p>
+                        <h2 class="h5 mb-0">{{ trans('learner.dashboard.workshops_title') }}</h2>
                     </div>
                 </div>
                 {% if enrolled_workshops %}
@@ -60,14 +59,23 @@
                         <div class="myc-enrollment-item">
                             <div>
                                 <p class="fw-semibold mb-1">{{ workshop.title }}</p>
-                                <p class="small text-muted mb-1">Date : {{ workshop.scheduledAt|date('d/m/Y H:i') }} · {{ workshop.location }}</p>
+                                <p class="small text-muted mb-1">{{ trans('learner.dashboard.date_label') }} : {{ workshop.scheduledAt|date('d/m/Y H:i') }} · {{ workshop.location }}</p>
                                 <p class="small text-muted mb-0">{{ workshop.nbInscrits }}/{{ workshop.nbPlaces }} inscrits · {{ workshop.price|number_format(2, ',', ' ') }} €</p>
                             </div>
-                            <a class="btn btn-sm btn-outline-primary" href="{{ path('atelier/' ~ workshop.id) }}">Détails</a>
+                            <div class="d-flex gap-2">
+                                <a class="btn btn-sm btn-outline-primary" href="{{ path('atelier/' ~ workshop.id) }}">{{ trans('learner.dashboard.details') }}</a>
+                                <form method="post" action="{{ path('espace') }}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                    <input type="hidden" name="action" value="unregister">
+                                    <input type="hidden" name="type" value="atelier">
+                                    <input type="hidden" name="content_id" value="{{ workshop.id }}">
+                                    <button class="btn btn-sm btn-outline-danger" type="submit">{{ trans('learner.dashboard.unregister') }}</button>
+                                </form>
+                            </div>
                         </div>
                     {% endfor %}
                 {% else %}
-                    <p class="text-muted mb-0">Aucun atelier planifié pour l'instant.</p>
+                    <p class="text-muted mb-0">{{ trans('learner.dashboard.empty_workshops') }}</p>
                 {% endif %}
             </div>
         </div>
