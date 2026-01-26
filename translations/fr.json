@@ -276,7 +276,7 @@
         "dashboard": {
             "title": "Mon espace",
             "kicker": "Mon espace",
-            "greeting": "Bonjour {{name}}",
+            "greeting": "Bonjour %name%",
             "default_name": "coach\u00e9",
             "courses_title": "Vos cours en cours",
             "courses_badge": "Cours inscrits",

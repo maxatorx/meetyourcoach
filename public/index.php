@@ -32,7 +32,6 @@ use App\Service\FlashBag;
 use App\Service\TwigFactory;
 use App\Service\Translator;
 
-// Services de base.
 $translationsDir = __DIR__ . '/../translations';
 $initialLocale = $_SESSION['locale'] ?? 'fr';
 $translator = new Translator($translationsDir, $initialLocale);
@@ -42,14 +41,14 @@ $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
 $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
 $httpMethod = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
 
-// Détection du sous-dossier pour les URLs.
+// Détection sous-dossier
 $scriptDir = str_replace('\\', '/', dirname($scriptName));
 if ($scriptDir === '/' || $scriptDir === '\\' || $scriptDir === '.') {
     $scriptDir = '';
 }
 $basePath = rtrim($scriptDir, '/');
 
-// Dépendances partagées.
+// Les dépendances
 $csrfTokenManager = new CsrfTokenManager();
 $userSession = new UserSession();
 $flashBag = new FlashBag();
@@ -58,7 +57,7 @@ $autoTranslateEnabled = filter_var($_ENV['AUTO_TRANSLATE_ENABLED'] ?? 'true', FI
 $autoTranslator = new AutoTranslator($cacheDir, $autoTranslateEnabled);
 $twig = TwigFactory::create($basePath, $translator, false, $scriptName ?: '/index.php', $autoTranslator);
 
-// Modèles (accès base de données).
+// Les modèles
 $contentModel = new ContentModel();
 $calendarModel = new CalendarModel();
 $calendarEventModel = new CalendarEventModel();
@@ -68,7 +67,7 @@ $userModel = new UserModel();
 $inscriptionModel = new InscriptionModel();
 $reviewModel = new ReviewModel();
 
-// Controllers.
+// Les controllers
 $authController = new AuthController($userModel, $twig, $userSession, $csrfTokenManager, $flashBag, $basePath);
 $homeController = new HomeController($contentModel, $twig, $userSession, $csrfTokenManager, $flashBag, $basePath);
 $calendarController = new CalendarController($calendarModel, $calendarEventModel, $twig, $userSession, $csrfTokenManager, $flashBag, $translator, $basePath);
@@ -81,7 +80,7 @@ $adminController = new AdminController($userModel, $courseModel, $workshopModel,
 $profileController = new ProfileController($userModel, $twig, $userSession, $csrfTokenManager, $flashBag, $basePath);
 $contactController = new ContactController($twig, $userSession, $csrfTokenManager, $flashBag, $basePath);
 
-// Routage simple base sur l'URL.
+// Routage
 $path = parse_url($requestUri, PHP_URL_PATH) ?: '/';
 $path = stripBasePath($path, $basePath);
 
@@ -105,7 +104,7 @@ try {
         return;
     }
 
-    // Catalogue / recherche.
+    // Catalogue / recherche
     if ($path === '/') {
         $homeController->index();
         return;
@@ -115,7 +114,7 @@ try {
         return;
     }
 
-    // Cours et ateliers (fiche + inscriptions/avis).
+    // Cours et ateliers
     if (preg_match('#^/cours/(\d+)$#', $path, $matches)) {
         $contentController->show('cours', (int) $matches[1], $httpMethod);
         return;
@@ -125,7 +124,6 @@ try {
         return;
     }
 
-    // Calendrier.
     if ($path === '/calendrier') {
         if ($httpMethod === 'POST') {
             $calendarController->createEvent();
@@ -143,7 +141,7 @@ try {
         return;
     }
 
-    // Espaces utilisateurs.
+    // Espaces utilisateurs
     if ($path === '/espace') {
         $learnerController->dashboard($httpMethod);
         return;
@@ -165,7 +163,6 @@ try {
         return;
     }
 
-    // Contact.
     if ($path === '/contact') {
         $contactController->index($httpMethod);
         return;
@@ -184,11 +181,11 @@ try {
     throw $exception;
 }
 
-// Page non trouvée.
+// Page non trouvée
 http_response_code(404);
 echo 'Page non trouvée';
 
-// Helpers simples pour le routage.
+// Helpers routage
 function buildPath(string $basePath, string $path): string
 {
     if ($path === '') {

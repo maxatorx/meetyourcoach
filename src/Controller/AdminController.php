@@ -15,9 +15,7 @@ use App\Service\FlashBag;
 use DateTimeImmutable;
 use Twig\Environment;
 
-/**
- * Administration : roles + validation + edition.
- */
+/** Administration : roles + validation + modif. */
 final class AdminController extends AbstractController
 {
     public function __construct(

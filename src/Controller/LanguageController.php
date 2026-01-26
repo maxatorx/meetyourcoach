@@ -7,9 +7,7 @@ namespace App\Controller;
 use App\Service\Translator;
 use Twig\Environment;
 
-/**
- * Changement de langue.
- */
+/** Changement de langue. */
 final class LanguageController extends AbstractController
 {
     public function __construct(

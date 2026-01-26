@@ -13,9 +13,7 @@ use App\Model\UserModel;
 use App\Model\WorkshopModel;
 use Twig\Environment;
 
-/**
- * Fiche d'un cours ou d'un atelier (inscription + avis).
- */
+/** Fiche cours ou atelier avec inscription + avis. */
 final class ContentController extends AbstractController
 {
     public function __construct(
@@ -35,9 +33,9 @@ final class ContentController extends AbstractController
 
     public function show(string $type, int $id, string $httpMethod): void
     {
-        // Page detail + actions associees.
+        // Page detail
         if ($httpMethod === 'POST') {
-            // Actions sur la fiche (inscription / avis).
+            // Actions sur inscription et avis.
             $action = $_POST['action'] ?? '';
             if ($action === 'register') {
                 $this->register($type, $id);
@@ -68,7 +66,7 @@ final class ContentController extends AbstractController
             return;
         }
 
-        // Bloque l'accès public tant que l'admin n'a pas validé le contenu.
+        // accès public bloqué tant que l'admin n'a pas validé le contenu.
         $isPublished = $type === 'cours'
             ? ($content->getStatus() === \App\Entity\Course::STATUT_PUBLIE)
             : ($content->getStatus() === \App\Entity\Workshop::STATUT_VALIDE);

@@ -8,9 +8,7 @@ use App\Entity\User;
 use App\Model\UserModel;
 use Twig\Environment;
 
-/**
- * Gestion de l'inscription, connexion et déconnexion.
- */
+/** Gestion inscriptions, connexions et déconnexions. */
 final class AuthController extends AbstractController
 {
     public function __construct(
@@ -58,7 +56,7 @@ final class AuthController extends AbstractController
             return;
         }
 
-        // Un nouvel utilisateur ne peut etre que apprenant ou formateur.
+        // selection pour nouveau user entre apprenant ou formateur.
         $role = $_POST['role'] ?? User::ROLE_APPRENANT;
         if (!in_array($role, [User::ROLE_APPRENANT, User::ROLE_FORMATEUR], true)) {
             $role = User::ROLE_APPRENANT;
@@ -166,7 +164,7 @@ final class AuthController extends AbstractController
 
     private function getReturnPath(): string
     {
-        // Retourne a la page precedente si possible, sinon accueil.
+        // retour a la page precedente si possible, sinon home.
         $default = '/index.php';
         $stored = $_SESSION['login_redirect'] ?? null;
         if (!is_string($stored) || $stored === '') {

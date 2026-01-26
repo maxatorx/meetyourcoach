@@ -9,9 +9,7 @@ use App\Security\UserSession;
 use App\Service\FlashBag;
 use Twig\Environment;
 
-/**
- * Base commune des controllers (render/redirect/roles).
- */
+/** Base des controllers (render/redirect/roles). */
 abstract class AbstractController
 {
     public function __construct(
@@ -50,7 +48,7 @@ abstract class AbstractController
 
     protected function requireLogin(): void
     {
-        // Espace protege : login obligatoire.
+        // login obligatoire.
         if (!$this->userSession->isLoggedIn()) {
             throw new \RuntimeException('AUTH_REQUIRED');
         }

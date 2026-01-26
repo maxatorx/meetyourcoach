@@ -276,7 +276,7 @@
         "dashboard": {
             "title": "My dashboard",
             "kicker": "My dashboard",
-            "greeting": "Hello {{name}}",
+            "greeting": "Hello %name%",
             "default_name": "learner",
             "courses_title": "Your ongoing courses",
             "courses_badge": "Registered courses",

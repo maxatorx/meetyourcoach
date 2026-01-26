@@ -7,9 +7,7 @@ namespace App\Controller;
 use App\Model\ContentModel;
 use Twig\Environment;
 
-/**
- * Recherche de cours/ateliers.
- */
+/** Recherche de cours/ateliers. */
 final class SearchController extends AbstractController
 {
     public function __construct(
@@ -20,19 +18,21 @@ final class SearchController extends AbstractController
         \App\Service\FlashBag $flashBag,
         string $basePath = ''
     ) {
+        // injection dependances
         parent::__construct($twig, $userSession, $csrfTokenManager, $flashBag, $basePath);
     }
 
     public function search(): void
     {
-        // Recherche par titre, type, niveau, date.
+        // filtres depuis query string. parametre absent = null
         $filters = [
-            'titre' => $_GET['titre'] ?? null,
-            'type' => $_GET['type'] ?? null,
-            'niveau' => $_GET['niveau'] ?? null,
-            'date' => $_GET['date'] ?? null,
+            'titre' => isset($_GET['titre']) ? trim((string) $_GET['titre']) : null,
+            'type' => isset($_GET['type']) ? trim((string) $_GET['type']) : null,
+            'niveau' => isset($_GET['niveau']) ? trim((string) $_GET['niveau']) : null,
+            'date' => isset($_GET['date']) ? trim((string) $_GET['date']) : null,
         ];
 
+        // Le model applique la requete en base avec ces filtres
         $results = $this->contentModel->search($filters);
 
         $this->render('search/index.html.twig', [

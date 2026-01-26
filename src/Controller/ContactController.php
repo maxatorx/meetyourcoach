@@ -7,9 +7,6 @@ namespace App\Controller;
 use DateTimeImmutable;
 use Twig\Environment;
 
-/**
- * Formulaire de contact simple.
- */
 final class ContactController extends AbstractController
 {
     public function __construct(
@@ -24,7 +21,6 @@ final class ContactController extends AbstractController
 
     public function index(string $httpMethod): void
     {
-        // Affiche le formulaire ou traite l'envoi.
         if ($httpMethod === 'POST') {
             $this->handleSubmission();
             return;
@@ -80,7 +76,7 @@ final class ContactController extends AbstractController
      */
     private function storeRequest(array $payload): void
     {
-        // Stockage simple en JSON (pas d'envoi d'email dans cette version).
+        // Stockage sans envoie par email.
         $directory = __DIR__ . '/../../var/contact';
         if (!is_dir($directory)) {
             mkdir($directory, 0775, true);

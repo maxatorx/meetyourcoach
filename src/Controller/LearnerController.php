@@ -14,9 +14,7 @@ use App\Security\CsrfTokenManager;
 use App\Service\FlashBag;
 use Twig\Environment;
 
-/**
- * Espace apprenant (profil + inscriptions + avis).
- */
+/** Espace apprenant (profil + inscriptions + avis). */
 final class LearnerController extends AbstractController
 {
     public function __construct(
@@ -36,7 +34,7 @@ final class LearnerController extends AbstractController
 
     public function dashboard(string $httpMethod): void
     {
-        // Espace accessible a tout utilisateur connecte.
+        // Espace accessible si connecté.
         $this->requireLogin();
 
         if ($httpMethod === 'POST') {

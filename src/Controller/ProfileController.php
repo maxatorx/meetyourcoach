@@ -10,9 +10,7 @@ use App\Security\UserSession;
 use App\Service\FlashBag;
 use Twig\Environment;
 
-/**
- * Profil utilisateur (edition simple).
- */
+/** Profil user */
 final class ProfileController extends AbstractController
 {
     public function __construct(
@@ -48,7 +46,7 @@ final class ProfileController extends AbstractController
             return;
         }
 
-        // Mise a jour du profil utilisateur (infos + photo).
+        // maj du profil user (infos + photo).
         $user = $this->userSession->getUser();
         $data = [
             'first_name' => trim($_POST['prenom'] ?? ''),

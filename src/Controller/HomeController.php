@@ -7,9 +7,7 @@ namespace App\Controller;
 use App\Model\ContentModel;
 use Twig\Environment;
 
-/**
- * Page d'accueil + catalogue.
- */
+/** Page d'accueil + catalogue. */
 final class HomeController extends AbstractController
 {
     public function __construct(

@@ -12,9 +12,7 @@ use DateInterval;
 use DateTimeImmutable;
 use Twig\Environment;
 
-/**
- * Calendrier des evenements (publics + personnels).
- */
+/** Calendrier des evenements publics et personnels. */
 final class CalendarController extends AbstractController
 {
     public function __construct(
@@ -32,7 +30,7 @@ final class CalendarController extends AbstractController
 
     public function index(): void
     {
-        // Vue calendrier mensuelle avec evenements publics + personnels.
+        // Vue calendrier mensuelle avec evenements publics et personnels.
         $month = (int) ($_GET['month'] ?? date('n'));
         $year = (int) ($_GET['year'] ?? date('Y'));
 
@@ -83,7 +81,7 @@ final class CalendarController extends AbstractController
     public function createEvent(): void
     {
         $this->requireLogin();
-        // Creation d'un evenement personnel dans le calendrier.
+        // Creation d'un evenement perso
         $token = $_POST['csrf_token'] ?? '';
         if (!$this->csrfTokenManager->validateToken($token, 'calendar_add_event')) {
             $this->flashBag->add('danger', 'Jeton CSRF invalide.');
@@ -138,7 +136,7 @@ final class CalendarController extends AbstractController
         $user = $this->userSession->getUser();
         $ownerId = $event->getUserId();
         if ($ownerId !== null) {
-            // Evenements personnels visibles par leur proprietaire ou l'admin.
+            // events perso visibles par l'user ou l'admin.
             if ($user === null) {
                 $this->redirect('/login');
                 return;
@@ -174,7 +172,7 @@ final class CalendarController extends AbstractController
 
         $user = $this->userSession->getUser();
         $ownerId = $event->getUserId();
-        // Suppression autorisee pour le proprietaire ou l'admin.
+        // Suppression autorisee pour user ou admin.
         if ($ownerId !== null && !$this->isOwnerOrAdmin($user, $ownerId)) {
             $this->flashBag->add('danger', 'Vous ne pouvez pas supprimer cet événement.');
             $this->redirect('/calendrier');
